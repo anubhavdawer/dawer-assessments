@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DawerOne Assessment — calcom/cal.com</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand:   #4F46E5;
+    --ink:     #0F172A;
+    --muted:   #64748B;
+    --border:  #E2E8F0;
+    --bg:      #F8FAFC;
+    --card:    #FFFFFF;
+    --crit-bg: #FEF2F2; --crit:  #DC2626;
+    --warn-bg: #FFFBEB; --warn:  #D97706;
+    --good-bg: #F0FDF4; --good:  #16A34A;
+    --code-bg: #1E293B; --code-fg: #E2E8F0;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.7;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+
+  /* ── Header */
+  .site-header {
+    background: var(--brand);
+    color: #fff;
+    padding: 24px 40px;
+    display: flex; align-items: center; gap: 24px;
+    position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .site-header .logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; }
+  .site-header .meta { font-size: .85rem; opacity: .85; }
+  .site-header .badges { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 99px; padding: 2px 10px; font-size: .78rem; color: #fff;
+  }
+
+  /* ── Layout */
+  .layout { display: flex; align-items: flex-start; max-width: 1280px; margin: 0 auto; width: 100%; padding: 32px 24px; gap: 40px; }
+
+  /* ── TOC */
+  .toc {
+    width: 240px; flex-shrink: 0;
+    position: sticky; top: 80px;
+    max-height: calc(100vh - 100px); overflow-y: auto;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+  }
+  .toc-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+  .toc a {
+    display: block; font-size: .82rem; color: var(--muted);
+    text-decoration: none; padding: 4px 6px; border-radius: 5px;
+    line-height: 1.4; transition: background .1s, color .1s;
+  }
+  .toc a:hover { background: var(--bg); color: var(--brand); }
+  .toc .sev { font-size: .8em; }
+
+  /* ── Content */
+  .content { flex: 1; min-width: 0; }
+
+  .content h1 {
+    font-size: 1.8rem; font-weight: 800; color: var(--brand);
+    border-bottom: 3px solid var(--brand); padding-bottom: 12px; margin-bottom: 20px;
+  }
+  .content h2 {
+    font-size: 1.2rem; font-weight: 700; color: var(--ink);
+    margin: 40px 0 14px;
+    padding: 10px 14px; background: var(--card); border-left: 4px solid var(--brand);
+    border-radius: 0 8px 8px 0; border: 1px solid var(--border); border-left: 4px solid var(--brand);
+  }
+  .content h3 { font-size: 1rem; font-weight: 700; margin: 24px 0 10px; color: var(--ink); }
+  .content h4 { font-size: .9rem; font-weight: 600; margin: 16px 0 8px; color: var(--muted); }
+
+  .content p { margin-bottom: 14px; }
+  .content ul, .content ol { margin: 0 0 16px 24px; }
+  .content li { margin-bottom: 5px; }
+
+  .content strong { font-weight: 700; }
+  .content em { font-style: italic; }
+  .content code {
+    background: #EFF6FF; color: #1D4ED8;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: .84em; padding: 1px 5px; border-radius: 4px;
+  }
+  .content pre {
+    background: var(--code-bg); color: var(--code-fg);
+    border-radius: 8px; padding: 16px; overflow-x: auto;
+    margin-bottom: 16px; font-size: .84rem; line-height: 1.6;
+  }
+  .content pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+  .content hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .content a { color: var(--brand); }
+
+  /* ── Tables */
+  .content table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: .9rem; }
+  .content thead { background: var(--brand); color: #fff; }
+  .content th { padding: 10px 14px; text-align: left; font-weight: 600; }
+  .content td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .content tbody tr:nth-child(even) { background: var(--bg); }
+  .content tbody tr:hover { background: #EEF2FF; }
+
+  /* ── Severity badges */
+  .sev   { font-size: 1em; }
+  .sev.c { color: var(--crit); }
+  .sev.w { color: var(--warn); }
+  .sev.g { color: var(--good); }
+
+  /* ── Cover / Risk Dashboard */
+  .cover {
+    background: #0F172A;
+    border-bottom: 1px solid #1E293B;
+  }
+  .cover-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 40px 40px 44px;
+    display: flex; gap: 48px; align-items: center;
+  }
+  .cover-left { flex-shrink: 0; min-width: 260px; }
+  .cover-eyebrow { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #64748B; margin-bottom: 8px; }
+  .cover-repo { font-size: 1.5rem; font-weight: 700; color: #F1F5F9; line-height: 1.2; margin-bottom: 4px; }
+  .cover-repo strong { color: #fff; }
+  .cover-meta { font-size: .8rem; color: #475569; margin-bottom: 28px; }
+  .cover-score-wrap { display: flex; align-items: center; gap: 16px; }
+  .cover-big-ring {
+    width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-big-inner {
+    width: 68px; height: 68px; background: #0F172A;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; gap: 2px;
+  }
+  .cover-big-num { font-size: 1.8rem; font-weight: 900; line-height: 1; }
+  .cover-big-denom { font-size: .85rem; font-weight: 600; color: #475569; align-self: flex-end; padding-bottom: 4px; }
+  .cover-score-title { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748B; margin-bottom: 4px; }
+  .cover-score-lbl { font-size: 1rem; font-weight: 800; }
+  .cover-right { flex: 1; }
+  .sc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 20px 12px; }
+  .sc-card { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sc-ring {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sc-inner {
+    width: 48px; height: 48px; background: #0F172A;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  }
+  .sc-num { font-size: 1.1rem; font-weight: 800; }
+  .sc-label { font-size: .72rem; font-weight: 600; color: #94A3B8; text-align: center; line-height: 1.3; }
+
+  /* ── Print */
+  @media print {
+    .toc, .site-header { display: none; }
+    .layout { padding: 0; }
+    .content h2 { break-before: page; }
+  }
+
+  /* ── Scrollbar */
+  .toc::-webkit-scrollbar { width: 4px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div>
+    <div class="logo">DawerOne</div>
+    <div class="meta">Codebase Assessment</div>
+  </div>
+  <div>
+    <div style="font-size:1rem;font-weight:600">calcom/cal.com</div>
+    <div class="meta">main · 2026-06-26</div>
+  </div>
+  <div class="badges">
+    <span class="badge">fullstack</span>
+    
+    <span class="badge">claude-opus-4-8</span>
+  </div>
+</header>
+
+
+<div class="cover">
+  <div class="cover-inner">
+    <div class="cover-left">
+      <div class="cover-eyebrow">DawerOne · Codebase Onboarding Report</div>
+      <div class="cover-repo">calcom/<strong>cal.com</strong></div>
+      <div class="cover-meta">fullstack &nbsp;·&nbsp; 2026-06-26</div>
+      <div class="cover-score-wrap">
+        <div class="cover-big-ring" style="background:conic-gradient(#D97706 60%, rgba(255,255,255,0.12) 60%)">
+          <div class="cover-big-inner">
+            <span class="cover-big-num" style="color:#D97706">6</span>
+            <span class="cover-big-denom">/10</span>
+          </div>
+        </div>
+        <div>
+          <div class="cover-score-title">Overall Score</div>
+          <div class="cover-score-lbl" style="color:#D97706">Warning</div>
+        </div>
+      </div>
+    </div>
+    <div class="cover-right">
+      <div class="sc-grid">
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 60%, rgba(255,255,255,0.12) 60%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
+        </div>
+        <div class="sc-label">Code Health</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 50%, rgba(255,255,255,0.12) 50%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div>
+        </div>
+        <div class="sc-label">Dependencies</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 70%, rgba(255,255,255,0.12) 70%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div>
+        </div>
+        <div class="sc-label">Architecture</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 60%, rgba(255,255,255,0.12) 60%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
+        </div>
+        <div class="sc-label">Security</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 60%, rgba(255,255,255,0.12) 60%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
+        </div>
+        <div class="sc-label">Test Coverage</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 60%, rgba(255,255,255,0.12) 60%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
+        </div>
+        <div class="sc-label">Prod Readiness</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 50%, rgba(255,255,255,0.12) 50%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div>
+        </div>
+        <div class="sc-label">Performance</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 70%, rgba(255,255,255,0.12) 70%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div>
+        </div>
+        <div class="sc-label">Docs</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#16A34A 80%, rgba(255,255,255,0.12) 80%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#16A34A">8</span></div>
+        </div>
+        <div class="sc-label">Infra & CI/CD</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <a href="#executive-summary">Executive Summary</a><a href="#1-project-summary">1. Project Summary</a><a href="#2-tech-stack">2. Tech Stack</a><a href="#3-architecture">3. Architecture</a><a href="#4-dependency-health">4. Dependency Health</a><a href="#5-infra-deployment">5. Infra &amp; Deployment</a><a href="#6-code-health">6. Code Health</a><a href="#7-completeness">7. Completeness</a><a href="#8-landmines">8. Landmines</a><a href="#9-production-readiness-gaps">9. Production Readiness Gaps</a><a href="#10-ownership-effort-estimate">10. Ownership Effort Estimate</a><a href="#11-data-model">11. Data Model</a><a href="#12-api-surface">12. API Surface</a><a href="#13-auth-authorization">13. Auth &amp; Authorization</a><a href="#14-async-layer">14. Async Layer</a><a href="#15-environment-variables">15. Environment Variables</a><a href="#16-state-management">16. State Management</a><a href="#17-routing">17. Routing</a><a href="#18-design-system">18. Design System</a><a href="#19-performance-flags">19. Performance Flags</a><a href="#20-coupling-assessment">20. Coupling Assessment</a><a href="#21-shared-types">21. Shared Types</a><a href="#quick-wins-outsized-impact">Quick Wins (Outsized Impact)</a>
+  </nav>
+  <main class="content">
+    <h1 id="dawerone-codebase-onboarding-assessment-calcom-cal-com-rebranded-cal-diy">DawerOne Codebase Onboarding Assessment — calcom/cal.com (rebranded &quot;Cal.diy&quot;)</h1>
+<h2 id="executive-summary">Executive Summary</h2>
+<p>This is the <strong>Cal.com scheduling platform monorepo</strong>, presented in this repository as a community fork rebranded <strong>&quot;Cal.diy&quot;</strong> (the README explicitly markets it as the MIT-only, enterprise-stripped edition, though large amounts of enterprise-oriented schema and code remain). It is a large, mature, production-grade Turborepo monorepo (~7,690 files) built on <strong>Next.js 16, React 18, tRPC, Prisma/PostgreSQL, and a separate NestJS &quot;API v2&quot; platform layer</strong>. The engineering quality is high by open-source standards: strong CI/CD with a security-gated PR pipeline, Biome linting, full TypeScript, Playwright E2E, changesets, and Dockerized deploys. However, the codebase is <strong>enormous, deeply coupled to Cal.com-internal services, and carries significant operational complexity</strong> — 150+ environment variables, ~50 app-store integrations, two parallel API generations (legacy + NestJS), and a Prisma schema exceeding 100KB with dozens of entities. The single largest risk for any party inheriting this is <strong>sheer surface area and the gap between the &quot;self-host MIT&quot; marketing and the reality of a system designed around Cal.com's hosted infrastructure</strong> (Stripe billing, Vercel, Trigger.dev, Unkey, Axiom, Sentry, Retell AI, etc.). This is not a small ownership commitment.</p>
+<hr>
+<h2 id="1-project-summary">1. Project Summary</h2>
+<ul><li><strong>Purpose:</strong> Scheduling/booking infrastructure (Calendly competitor): event types, availability, bookings, calendar integrations, video, workflows, teams/organizations, payments.</li><li><strong>Maturity:</strong> Very high. <code>@calcom/web</code> is at v6.2.0; this is a battle-tested product with years of history, extensive migrations, and a mature CI pipeline.</li><li><strong>Current state:</strong> Active, healthy commit cadence. The repo is a <strong>fork/rebrand</strong> (&quot;Cal.diy&quot;) that claims to strip enterprise features — but the Prisma schema still contains organizations, delegation credentials, platform OAuth clients, SAML (<code>@boxyhq/saml-jackson</code>), billing, credits, and Cal.ai voice agents. The &quot;enterprise removed&quot; claim in the README is <strong>only partially true</strong> and should be verified, not trusted.</li><li><strong>Rating:</strong> <span class="sev g">🟢</span> Mature product / <span class="sev w">🟡</span> fork provenance and &quot;what's actually removed&quot; needs auditing.</li></ul>
+<hr>
+<h2 id="2-tech-stack">2. Tech Stack</h2>
+<table><thead><tr><th>Layer</th><th>Technology</th><th>Version</th></tr></thead><tbody><tr><td>Monorepo</td><td>Turborepo</td><td>2.7.1</td></tr><tr><td>Package manager</td><td>Yarn (Berry)</td><td>4.12.0</td></tr><tr><td>Language</td><td>TypeScript</td><td>5.9.3</td></tr><tr><td>Web framework</td><td>Next.js</td><td>16.2.3</td></tr><tr><td>UI</td><td>React / React DOM</td><td>18.2.0</td></tr><tr><td>API (typed RPC)</td><td>tRPC</td><td>(workspace <code>@calcom/trpc</code>)</td></tr><tr><td>Platform API</td><td>NestJS</td><td>10.4.20</td></tr><tr><td>ORM</td><td>Prisma</td><td>client 5.4.2 (patched), internals 6.16.2</td></tr><tr><td>DB</td><td>PostgreSQL</td><td>&gt;=13</td></tr><tr><td>Query builder</td><td>Kysely (prisma-kysely codegen)</td><td>—</td></tr><tr><td>Auth</td><td>NextAuth</td><td>4.24.13</td></tr><tr><td>SAML/SSO</td><td>@boxyhq/saml-jackson</td><td>1.52.2</td></tr><tr><td>State/data</td><td>TanStack Query 5.17, Jotai 2.12, nuqs 2.8</td><td>—</td></tr><tr><td>Styling</td><td>Tailwind CSS</td><td>4.1.17</td></tr><tr><td>Validation</td><td>Zod</td><td>3.25.76</td></tr><tr><td>Payments</td><td>Stripe</td><td>web: 9.16.0, api-v2: 15.4.0</td></tr><tr><td>Email</td><td>Nodemailer 7, Resend, SendGrid</td><td>—</td></tr><tr><td>Video</td><td>Daily.co</td><td>—</td></tr><tr><td>Queues/async</td><td>Bull + Redis (api-v2), Trigger.dev, internal Tasker</td><td>—</td></tr><tr><td>Observability</td><td>Sentry 10.33, next-axiom, PostHog</td><td>—</td></tr><tr><td>Lint/format</td><td>Biome</td><td>2.3.10</td></tr><tr><td>Testing</td><td>Vitest 4.1.8, Playwright 1.57, Jest (api-v2)</td><td>—</td></tr></tbody></table>
+<p><strong>Flag <span class="sev w">🟡</span>:</strong> <strong>React 18 + Next.js 16</strong> is an unusual pairing — Next 16 is built for React 19, and the root <code>resolutions</code> pin React 19.2.4 for transitive deps while <code>@calcom/web</code> declares React 18.2.0. This version skew is a latent compatibility risk and should be validated.</p>
+<p><strong>Flag <span class="sev w">🟡</span>:</strong> Prisma is on a <strong>patched 5.4.2 client</strong> (<code>.yarn/patches/@prisma-client-npm-5.4.2-fca489b2dc.patch</code>, 29KB) while internals are 6.x. Carrying a 29KB patch against the ORM is a meaningful maintenance liability.</p>
+<hr>
+<h2 id="3-architecture">3. Architecture</h2>
+<p><strong>Monorepo structure (Turborepo + Yarn workspaces):</strong></p>
+<ul><li><code>apps/web</code> — the main Next.js application (web app + legacy <code>/api</code> Next routes + tRPC host).</li><li><code>apps/api/v2</code> — a standalone <strong>NestJS</strong> &quot;Platform API&quot; (separate runtime, Bull/Redis, Swagger, JWT/OAuth2, deployed serverless on Vercel via a singleton Express handler).</li><li><code>apps/website</code>, <code>apps/ai</code>, <code>apps/console</code>, <code>apps/api-proxy</code>, <code>apps/swagger</code> — supporting apps.</li><li><code>packages/features/*</code> — the bulk of domain logic (auth, bookings, webhooks, tasker, credentials, profiles, users).</li><li><code>packages/app-store/*</code> — ~50+ third-party integrations (Google, Office365, Zoom, Stripe, HubSpot, Salesforce, etc.).</li><li><code>packages/prisma</code> — schema, migrations, Zod/Kysely codegen.</li><li><code>packages/trpc</code> — the typed API router tree.</li><li><code>packages/ui</code>, <code>@coss/ui</code> — design system.</li><li><code>packages/platform/<em></code>, <code>packages/embeds/</em></code> — embeddable React &quot;Atoms&quot; + platform SDK.</li></ul>
+<p><strong>Patterns:</strong> Repository pattern (<code>UserRepository</code>, <code>CredentialRepository</code>, <code>ProfileRepository</code>), service classes, tRPC router-per-domain, NestJS modules per domain. Reasonably clean layering.</p>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> Architecture is coherent and modular for its size. <span class="sev w">🟡</span> The <strong>two-API-generation split</strong> (Next <code>/api</code> legacy + tRPC + NestJS api-v2) is a significant cognitive and operational tax — three ways to expose backend functionality.</p>
+<hr>
+<h2 id="4-dependency-health">4. Dependency Health</h2>
+<ul><li><strong>Runtime:</strong> Node 20 (Dockerfile) — <span class="sev g">🟢</span> supported. README still claims Node &quot;&gt;=18.x&quot; — <span class="sev w">🟡</span> inconsistent; Node 18 is EOL (April 2025).</li><li><strong>Resolutions block:</strong> The root <code>package.json</code> carries an extraordinarily large <code>resolutions</code> map (~80 pins) — many are clearly <strong>security-driven overrides</strong> (axios 1.15, form-data 4.0.4, jsonwebtoken 9.0.0, tar 7.5.11, node-forge 1.4.0, qs 6.14.2). This signals the team is actively patching transitive CVEs, which is good — but the volume indicates a <strong>large, hard-to-audit transitive dependency surface</strong>.</li><li><strong>Patched packages:</strong> 5 yarn patches including the 29KB Prisma client patch and dayjs patches. <span class="sev w">🟡</span> Maintenance burden on upgrade.</li><li><strong>Version skew:</strong> React 18 declared vs React 19 resolutions (see §2). Multiple Stripe SDK versions (9.x web vs 15.x api-v2). <code>@microsoft/microsoft-graph-types-beta</code> differs between web (0.15) and api-v2 (0.42).</li><li><strong>Audit posture:</strong> CI runs <code>yarn npm audit --severity critical</code> and fails on critical — <span class="sev g">🟢</span> a real gate, though only critical-level.</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> Actively maintained but heavy. The override count and ORM patch are debt hot-spots.</p>
+<hr>
+<h2 id="5-infra-deployment">5. Infra &amp; Deployment</h2>
+<ul><li><strong>CI/CD:</strong> Extensive — 60+ workflow files. The <code>pr.yml</code> pipeline is sophisticated, with a <strong>security-gated <code>trust-check</code></strong> that prevents <code>pull_request_target</code> secret exposure to untrusted forks (requires <code>run-ci</code> label). <span class="sev g">🟢</span> This is best-practice supply-chain hygiene.</li><li><strong>Pipeline coverage:</strong> type-check, lint, unit, api-v2 unit, security audit, prisma migration check, integration, E2E (web/api-v2/app-store/embed/embed-react), bundle analysis. <span class="sev g">🟢</span> Comprehensive.</li><li><strong>Cron:</strong> ~12 GitHub-Actions cron workflows (booking reminders, SMS/WhatsApp/email reminders, digest emails, webhook triggers, timezone changes, downgrades). <span class="sev w">🟡</span> <strong>Scheduling logic lives in GitHub Actions cron</strong>, which is a non-obvious operational dependency — a self-hoster on Docker-only will silently lose these.</li><li><strong>Docker:</strong> Multi-stage Dockerfile with <code>turbo prune</code>. <span class="sev w">🟡</span> <strong>Requires a live DATABASE_URL at build time</strong> (documented), which is awkward. ARM requires separate image tags.</li><li><strong>Hosting:</strong> Vercel-first (api-v2 ships a Vercel serverless handler; org subdomain provisioning calls Vercel + Cloudflare APIs). Railway/Render/Northflank/Elestio templates provided.</li><li><strong>IaC:</strong> None — no Terraform/Pulumi. Deployment is platform-template-driven.</li></ul>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> CI/CD maturity is a genuine strength. <span class="sev w">🟡</span> Deep Vercel/GitHub-Actions coupling undermines the &quot;self-host anywhere&quot; pitch.</p>
+<hr>
+<h2 id="6-code-health">6. Code Health</h2>
+<ul><li><strong>Linting/formatting:</strong> Biome 2.3.10 across the monorepo; pre-commit via Husky + lint-staged. <span class="sev g">🟢</span></li><li><strong>Typing:</strong> Full TypeScript with <code>tsc-absolute</code> CI type-check; type-check requires 12GB heap (<code>--max-old-space-size=12288</code>). <span class="sev w">🟡</span> The 12GB heap requirement for type-checking is a red flag for codebase size/inference cost — onboarding devs on modest machines will struggle.</li><li><strong>Tests:</strong> Vitest (unit), Playwright (E2E), Jest (api-v2). Coverage exists but is broad rather than guaranteed-deep; E2E is gated behind labels.</li><li><strong>Naming/consistency:</strong> Generally consistent (repository/service patterns, router-per-domain). The auth file contains substantial inline comments documenting legacy-bug workarounds (&quot;FIX LEGACY ISSUE WHERE identityProviderId was accidentally set to userId&quot;) — <span class="sev w">🟡</span> evidence of accreted complexity in the most security-sensitive code.</li><li><strong>Dead code / TODOs:</strong> Visible <code>// TODO: apply ratelimits</code> in <code>endpoints.module.ts</code> — rate limiting is stubbed at the NestJS endpoints module level (though a <code>CustomThrottlerGuard</code> exists globally).</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> High discipline, but the auth and booking subsystems carry years of compatibility cruft.</p>
+<hr>
+<h2 id="7-completeness">7. Completeness</h2>
+<ul><li><strong>Done &amp; production-proven:</strong> Bookings, event types, availability, calendar integrations, video, teams/orgs, SAML, payments, webhooks, embeds, platform API. This is a complete product.</li><li><strong>Partial/feature-flagged:</strong> Cal.ai voice agents (Retell), credits/billing, organizations self-serve, quick-availability rollout (<code>NEXT_PUBLIC_QUICK_AVAILABILITY_ROLLOUT=10</code> — percentage rollout), single-org mode.</li><li><strong>Stubbed:</strong> Endpoint-level rate limiting (<code>TODO</code>), CSP &quot;strict&quot; mode (README: &quot;strict isn't supported yet&quot;).</li><li><strong>&quot;Removed&quot; but not really:</strong> Despite the fork's claim that orgs/SSO/workflows/insights are stripped, the schema and dependencies (<code>@boxyhq/saml-jackson</code>, org models, platform OAuth) are present. <span class="sev c">🔴</span> <strong>The fork's marketing does not match the code</strong> — a buyer must not assume enterprise code is absent.</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> Feature-complete product, but provenance/feature-removal claims require verification.</p>
+<hr>
+<h2 id="8-landmines">8. Landmines</h2>
+<ul><li><span class="sev c">🔴</span> <strong>Insecure default secrets in Docker:</strong> <code>NEXTAUTH_SECRET=secret</code> and <code>CALENDSO_ENCRYPTION_KEY=secret</code> are baked as Dockerfile <code>ARG</code> defaults. The README warns to override them, but the defaults will silently produce an insecure instance if a self-hoster skips the step. <code>CALENDSO_ENCRYPTION_KEY</code> protects 2FA secrets and backup codes (AES-256) — a default value is catastrophic.</li><li><span class="sev c">🔴</span> <strong>Committed CRON_API_KEY:</strong> <code>.env.example</code> ships <code>CRON_API_KEY='0cc0e6c35519bba620c9360cfe3e68d0'</code> — a real-looking value in an example file invites copy-paste into production. Cron endpoints would be exposed.</li><li><span class="sev w">🟡</span> <strong>Build-time DB requirement:</strong> Docker build needs a live database, complicating CI/CD and air-gapped builds.</li><li><span class="sev w">🟡</span> <strong>150+ global env vars</strong> in <code>turbo.json</code> — configuration is sprawling and error-prone; many cross-cutting flags (<code>NEXT_PUBLIC_*</code>) bake into the client bundle at build time, so changing them requires rebuild (the start script does runtime find/replace as a workaround — itself a landmine).</li><li><span class="sev w">🟡</span> <strong>Auth callback complexity:</strong> <code>next-auth-options.ts</code> (~45KB) contains intricate account-merging, identity-provider linking, and legacy-bug fixes. Account-linking logic is historically the #1 source of auth vulnerabilities (pre-hijacking). There are mitigations present, but this file is a high-risk change surface.</li><li><span class="sev w">🟡</span> <strong><code>allowDangerousEmailAccountLinking: true</code></strong> on Google and Azure AD providers — deliberate, with verification guards, but inherently sensitive.</li><li><span class="sev w">🟡</span> <strong><code>NODE_TLS_REJECT_UNAUTHORIZED=0</code></strong> suggested in README for load-balancer SSL termination — disables TLS verification globally if misapplied.</li><li><span class="sev w">🟡</span> <strong>Type-check requires 12GB RAM</strong> — a practical landmine for contributor onboarding and CI cost.</li></ul>
+<hr>
+<h2 id="9-production-readiness-gaps">9. Production Readiness Gaps</h2>
+<ol><li><span class="sev c">🔴</span> Rotate/remove the committed <code>CRON_API_KEY</code> from <code>.env.example</code>; never ship live-looking secrets.</li><li><span class="sev c">🔴</span> Remove insecure <code>secret</code> defaults for <code>NEXTAUTH_SECRET</code> / <code>CALENDSO_ENCRYPTION_KEY</code> from the Dockerfile, or hard-fail at boot if unset in production.</li><li><span class="sev w">🟡</span> Resolve React 18-vs-19 version skew before any production build is trusted on Next 16.</li><li><span class="sev w">🟡</span> Establish the cron strategy for non-Vercel/non-GitHub deployments — the reminder/webhook crons are GitHub-Actions-driven and won't run in a plain Docker deploy.</li><li><span class="sev w">🟡</span> Implement the stubbed endpoint rate limiting in api-v2 (<code>endpoints.module.ts</code> TODO) and confirm <code>UNKEY</code>/throttler coverage on all public endpoints.</li><li><span class="sev w">🟡</span> Provision Redis (required by api-v2 Bull + throttler) — not mentioned in the basic self-host path.</li><li><span class="sev w">🟡</span> Confirm what enterprise code was actually removed vs. left dormant in the schema; dormant org/billing tables on an MIT &quot;personal&quot; deploy are confusing and risky.</li><li><span class="sev w">🟡</span> Define observability defaults (Sentry/Axiom/PostHog are all optional but wired throughout).</li></ol>
+<hr>
+<h2 id="10-ownership-effort-estimate">10. Ownership Effort Estimate</h2>
+<table><thead><tr><th>Task</th><th>Size</th><th>Notes</th></tr></thead><tbody><tr><td>Onboard a new dev (productive in one area)</td><td><strong>L</strong></td><td>Monorepo is huge; 12GB type-check, 150+ env vars, two API generations.</td></tr><tr><td>First safe deploy</td><td><strong>L</strong></td><td>Secrets, Redis, DB-at-build-time, cron strategy, Vercel coupling all require care.</td></tr><tr><td>Full ownership (maintain + extend everything)</td><td><strong>XL</strong></td><td>~50 integrations, NestJS + Next + tRPC, patched Prisma, auth complexity, billing/credits/AI subsystems. This is a multi-engineer, ongoing commitment.</td></tr></tbody></table>
+<hr>
+<h2 id="11-data-model">11. Data Model</h2>
+<ul><li><strong>ORM:</strong> Prisma (PostgreSQL), schema <strong>&gt;100KB</strong> — one of the largest single Prisma schemas you'll encounter. Codegen feeds Zod (<code>zod-prisma-types</code>), Kysely (<code>prisma-kysely</code>), and an enum generator.</li><li><strong>Core entities:</strong> <code>User</code>, <code>UserPassword</code> (split out to avoid leaking hashes — <span class="sev g">🟢</span> good), <code>Profile</code>, <code>Team</code> (doubles as Organization via <code>isOrganization</code>/<code>parentId</code>), <code>Membership</code>, <code>EventType</code>, <code>Booking</code>, <code>Attendee</code>, <code>Credential</code>, <code>DestinationCalendar</code>, <code>Host</code>/<code>HostGroup</code>/<code>HostLocation</code>, <code>Schedule</code>/<code>Availability</code>, <code>Webhook</code>, <code>CreditBalance</code>/Credit logs, <code>CalAiPhoneNumber</code>/<code>Agent</code>.</li><li><strong>Relationships:</strong> Highly interconnected; <code>EventType</code> alone has ~40 relations/fields. <code>Team</code> is heavily overloaded (team + org + platform billing + managed orgs).</li><li><strong>Indexing:</strong> <span class="sev g">🟢</span> Thoughtful — composite indexes on <code>Booking</code> (<code>[startTime,endTime,status]</code>, <code>[userId,status,startTime]</code>, <code>[eventTypeId,status]</code>) show query-pattern awareness.</li><li><strong>Soft-delete:</strong> Inconsistent — <code>BookingReference.deleted</code> flag exists, but most models hard-delete via <code>onDelete: Cascade</code>. No global soft-delete convention. <span class="sev w">🟡</span></li><li><strong>Migration state:</strong> Mature migrations dir; CI has a dedicated <code>check-prisma-migrations</code> job and <code>oasdiff</code> API-diff (476KB ignore file) — <span class="sev g">🟢</span> disciplined migration governance.</li><li><strong>Tech debt in schema:</strong> Multiple deprecated columns explicitly annotated (<code>price</code>, <code>currency</code>, <code>weightAdjustment</code>, <code>scheduledJobs</code>, <code>organizationId</code> on User) — <span class="sev w">🟡</span> deprecations linger, increasing read-path ambiguity.</li></ul>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> Well-indexed and codegen-driven; <span class="sev w">🟡</span> overloaded <code>Team</code> model and lingering deprecated columns.</p>
+<hr>
+<h2 id="12-api-surface">12. API Surface</h2>
+<ul><li><strong>Three surfaces:</strong> (1) <strong>tRPC</strong> — <code>viewer</code> router with ~30 sub-routers (bookings, eventTypes, availability, slots, admin, apiKeys, webhooks, etc.); type-safe, internal-facing. (2) <strong>Legacy Next.js <code>/api</code></strong> routes (integration callbacks, webhooks, stripe). (3) <strong>NestJS API v2</strong> — public Platform REST API with <strong>Swagger/OpenAPI</strong>, JWT/OAuth2 auth, versioned under <code>/api/v2</code> and <code>/v2</code>.</li><li><strong>Versioning:</strong> Explicit <code>/v2</code> plus a <code>CreationSource</code> enum (<code>API_V1</code>, <code>API_V2</code>, <code>WEBAPP</code>) tracked on records — <span class="sev g">🟢</span> mature.</li><li><strong>Documentation:</strong> Swagger generated for api-v2; <code>oasdiff</code> enforces no-breaking-changes in CI — <span class="sev g">🟢</span>.</li></ul>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> Strong for the public platform API. <span class="sev w">🟡</span> Three overlapping surfaces is a maintenance and consistency burden.</p>
+<hr>
+<h2 id="13-auth-authorization">13. Auth &amp; Authorization</h2>
+<ul><li><strong>Authentication:</strong> NextAuth (JWT strategy) with Credentials (bcrypt + TOTP 2FA + backup codes), Google OAuth, Azure AD, SAML (BoxyHQ), and Email magic links. api-v2 uses JWT + OAuth2 (Passport).</li><li><strong>2FA:</strong> TOTP with AES-256-encrypted secrets and encrypted backup codes — <span class="sev g">🟢</span> solid implementation.</li><li><strong>Authorization:</strong> <code>UserPermissionRole</code> (USER/ADMIN), <code>MembershipRole</code> (MEMBER/ADMIN/OWNER), plus a custom <code>Role</code> model (RBAC). Admin actions gated; &quot;INACTIVE_ADMIN&quot; downgrade if an admin lacks 2FA/strong password — <span class="sev g">🟢</span> thoughtful.</li><li><strong>Rate limiting:</strong> Login path calls <code>checkRateLimitAndThrowError</code> keyed on hashed email — <span class="sev g">🟢</span>. But api-v2 endpoint-level rate limiting is a <code>TODO</code> — <span class="sev w">🟡</span>.</li><li><strong>Known gaps/risks:</strong> <code>allowDangerousEmailAccountLinking: true</code> (mitigated); extensive legacy account-merge logic; <code>hasValidLicense = false</code> hardcoded in session callback (a deliberate fork artifact, but worth noting). E2E mode bypasses admin password/2FA checks (<code>NEXT_PUBLIC_IS_E2E</code>) — ensure this is never truthy in prod.</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> Strong primitives, but the merge/linking logic is complex and security-critical.</p>
+<hr>
+<h2 id="14-async-layer">14. Async Layer</h2>
+<ul><li><strong>Internal Tasker:</strong> A typed abstraction (<code>packages/features/tasker</code>) with <code>internal</code> and <code>redis</code> backends; typed task payloads (sendWebhook, sendSms, no-show webhooks, CRM events, analytics, email, booking audit, webhook delivery).</li><li><strong>Bull + Redis:</strong> api-v2 uses <code>@nestjs/bull</code> with Redis (TLS in prod).</li><li><strong>Trigger.dev:</strong> Optional async tasker (<code>ENABLE_ASYNC_TASKER</code>) with prod/staging deploy scripts.</li><li><strong>Cron:</strong> ~12 GitHub-Actions scheduled workflows drive time-based jobs (reminders, digests, webhook triggers).</li><li><span class="sev w">🟡</span> <strong>Fragmentation:</strong> Four async mechanisms (internal tasker, Bull, Trigger.dev, GitHub cron) with overlapping responsibilities. A self-hoster must understand which are active in their deployment to avoid silently dropped reminders/webhooks.</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> Capable but fragmented; high operational literacy required.</p>
+<hr>
+<h2 id="15-environment-variables">15. Environment Variables</h2>
+<ul><li><code>.env.example</code> is <strong>17.6KB</strong>; <code>turbo.json</code> lists <strong>150+ globalEnv</strong> entries. A separate <code>.env.appStore.example</code> (4.1KB) exists for integrations.</li><li><strong>Secrets management:</strong> Infisical is referenced in scripts (<code>infisical run</code>, <code>i-dev</code>, env-gen). No secrets are committed <em>except</em> the problematic <code>CRON_API_KEY</code> value and the <code>secret</code> Dockerfile defaults (see §8).</li><li><strong>Validation:</strong> <code>dotenv-checker</code> env-check tasks run before dev (<code>env-check:common</code>, <code>env-check:app-store</code>) — <span class="sev g">🟢</span>.</li><li><span class="sev c">🔴</span> Remove the live-looking <code>CRON_API_KEY</code> from <code>.env.example</code>.</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> Well-documented but overwhelming; two committed-default landmines.</p>
+<hr>
+<h2 id="16-state-management">16. State Management</h2>
+<ul><li><strong>Server state:</strong> TanStack React Query 5.17 (via tRPC) — the dominant data layer.</li><li><strong>Client/global state:</strong> <strong>Jotai</strong> (atomic) 2.12 + <strong>nuqs</strong> (URL state) 2.8. No Redux. <code>kbar</code> for command palette.</li><li><strong>Approach:</strong> Server-state-first with minimal global client state — <span class="sev g">🟢</span> a modern, low-complexity choice appropriate for the app.</li></ul>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> Sound.</p>
+<hr>
+<h2 id="17-routing">17. Routing</h2>
+<ul><li><strong>Next.js 16</strong> App Router (with legacy <code>/api</code> Pages routes for webhooks/integrations). <code>--turbopack</code> in dev.</li><li><strong>Dynamic routes:</strong> Username/org-subdomain booking pages, embeds, app-store callbacks. Org subdomains require real DNS (Vercel/Cloudflare provisioning) — a notable infra coupling.</li><li><strong>Code splitting:</strong> Heavy use of dynamic <code>import()</code> in auth and elsewhere; bundle budget enforced (358KB, <code>nextBundleAnalysis</code>) with CI analysis — <span class="sev g">🟢</span>.</li></ul>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> Modern routing with bundle governance; <span class="sev w">🟡</span> org subdomain routing has infra dependencies.</p>
+<hr>
+<h2 id="18-design-system">18. Design System</h2>
+<ul><li><strong>Two UI packages:</strong> <code>@calcom/ui</code> (Radix-based primitives, Lexical rich-text editor, react-select, react-day-picker, class-variance-authority) and <code>@coss/ui</code>. <span class="sev w">🟡</span> Two design-system packages is a consolidation smell.</li><li><strong>Granular exports:</strong> <code>@calcom/ui</code> uses explicit per-component export maps (good for tree-shaking, <code>sideEffects: false</code>).</li><li><strong>Styling:</strong> Tailwind CSS 4.x + <code>tailwind-merge</code>. Consistent token-driven theming (brandColor/darkBrandColor on User/Team).</li><li><strong>Embeddable &quot;Atoms&quot;:</strong> <code>@calcom/atoms</code> — published npm React components for the platform.</li></ul>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> Mature, tree-shakeable; <span class="sev w">🟡</span> dual UI packages.</p>
+<hr>
+<h2 id="19-performance-flags">19. Performance Flags</h2>
+<ul><li><span class="sev g">🟢</span> Bundle budget enforced in CI (358KB) with PR annotations; granular UI exports; <code>sideEffects: false</code>.</li><li><span class="sev w">🟡</span> <strong>React 18 on Next 16</strong> prevents leveraging Next 16/React 19 perf features and risks hydration issues until skew is resolved.</li><li><span class="sev w">🟡</span> <code>sharp</code>, <code>jsdom</code>, <code>handlebars</code>, full <code>googleapis</code>, <code>@boxyhq/saml-jackson</code>, multiple Stripe SDKs — heavy server dependencies inflate cold-start, especially in the api-v2 <strong>serverless</strong> path (NestJS bootstrap on Vercel is cold-start-sensitive; the singleton handler mitigates warm invocations).</li><li><span class="sev w">🟡</span> Slots/availability is a known hot path — env flags for caching (<code>SLOTS_CACHE_TTL</code>, worker pools, quick-availability rollout) indicate ongoing perf tuning under load.</li><li><span class="sev g">🟢</span> Performance-tests CI workflow exists.</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> Actively managed, but serverless NestJS cold starts and version skew are real risks at scale.</p>
+<hr>
+<h2 id="20-coupling-assessment">20. Coupling Assessment</h2>
+<ul><li><strong>Frontend ↔ Backend:</strong> The web app <strong>co-hosts</strong> tRPC and legacy <code>/api</code> routes — frontend and the legacy backend are not independently deployable; they ship as one Next.js app.</li><li><strong>api-v2 (NestJS):</strong> Genuinely decoupled — separate runtime, separate deploy, communicates over HTTP/OpenAPI. The platform &quot;Atoms&quot; SDK consumes it. <span class="sev g">🟢</span></li><li><strong>Shared core:</strong> Both depend on <code>packages/features</code>, <code>packages/prisma</code>, <code>packages/platform-*</code> — so they're <strong>code-coupled at the monorepo level</strong> even when runtime-decoupled.</li><li><strong>External coupling:</strong> Heavy ties to Vercel (serverless handler, domain provisioning), Cloudflare, Trigger.dev, Unkey, Stripe, Sentry/Axiom — the &quot;self-host&quot; story is more aspirational than turnkey.</li></ul>
+<p><strong>Rating:</strong> <span class="sev w">🟡</span> api-v2 is cleanly separable; the web app + legacy API are monolithic; everything is bound by shared packages and third-party platform assumptions.</p>
+<hr>
+<h2 id="21-shared-types">21. Shared Types</h2>
+<ul><li><span class="sev g">🟢</span> <strong>Best-in-class type sharing.</strong> tRPC gives end-to-end inferred types between the web app and its backend (<code>AppRouter</code> exported). Prisma codegen produces shared Zod schemas (<code>zod-prisma-types</code>), Kysely types, and enums consumed across packages. The api-v2 shares <code>@calcom/platform-types</code>, <code>@calcom/platform-enums</code>, <code>@calcom/platform-constants</code> with the web app and the published SDK. No manual duplication of core types; class-validator/class-transformer add DTO validation on the NestJS side.</li></ul>
+<p><strong>Rating:</strong> <span class="sev g">🟢</span> A genuine strength.</p>
+<hr>
+<h2 id="quick-wins-outsized-impact">Quick Wins (Outsized Impact)</h2>
+<ol><li><span class="sev c">🔴</span> <strong>Purge committed secrets/defaults:</strong> Remove the live-looking <code>CRON_API_KEY</code> from <code>.env.example</code> and the <code>secret</code> defaults for <code>NEXTAUTH_SECRET</code>/<code>CALENDSO_ENCRYPTION_KEY</code> from the Dockerfile; make production boot <strong>hard-fail</strong> when they're unset. One-day change, removes the two worst landmines.</li><li><span class="sev w">🟡</span> <strong>Resolve the React 18 vs 19 / Next 16 version skew</strong> and document the supported matrix. This de-risks every build and unlocks framework perf features.</li><li><span class="sev w">🟡</span> <strong>Write a &quot;true self-host&quot; runbook</strong> that lists what's actually required (Redis, cron strategy outside GitHub Actions, DB-at-build, which async backend is active) and what the fork removed vs. left dormant. Closes the gap between the README's promise and operational reality.</li><li><span class="sev w">🟡</span> <strong>Implement the stubbed api-v2 endpoint rate limiting</strong> (<code>endpoints.module.ts</code> TODO) and audit that every public endpoint is covered by the throttler. Small surface, direct security/abuse impact.</li><li><span class="sev w">🟡</span> <strong>Consolidate the UI packages</strong> (<code>@calcom/ui</code> + <code>@coss/ui</code>) and pick a single async/job mechanism as canonical — both reduce long-term cognitive load for any team taking ownership.</li></ol>
+  </main>
+</div>
+
+<script>
+  // Highlight active TOC link on scroll
+  const links = document.querySelectorAll('.toc a');
+  const headings = [...document.querySelectorAll('.content h2')];
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY + 120;
+    let active = headings.findIndex(h => h.offsetTop > y) - 1;
+    if (active < 0) active = 0;
+    links.forEach((l, i) => l.style.color = i === active ? 'var(--brand)' : '');
+  }, { passive: true });
+</script>
+</body>
+</html>
