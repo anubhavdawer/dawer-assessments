@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DawerOne Assessment — steven-tey/precedent</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand:   #4F46E5;
+    --ink:     #0F172A;
+    --muted:   #64748B;
+    --border:  #E2E8F0;
+    --bg:      #F8FAFC;
+    --card:    #FFFFFF;
+    --crit-bg: #FEF2F2; --crit:  #DC2626;
+    --warn-bg: #FFFBEB; --warn:  #D97706;
+    --good-bg: #F0FDF4; --good:  #16A34A;
+    --code-bg: #1E293B; --code-fg: #E2E8F0;
+  }
+
+  html { font-size: 16px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.7;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+
+  /* ── Header */
+  .site-header {
+    background: var(--brand);
+    color: #fff;
+    padding: 24px 40px;
+    display: flex; align-items: center; gap: 24px;
+    position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  }
+  .site-header .logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; }
+  .site-header .meta { font-size: .85rem; opacity: .85; }
+  .site-header .badges { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 99px; padding: 2px 10px; font-size: .78rem; color: #fff;
+  }
+
+  /* ── Layout */
+  .layout { display: flex; align-items: flex-start; max-width: 1280px; margin: 0 auto; width: 100%; padding: 32px 24px; gap: 40px; }
+
+  /* ── TOC */
+  .toc {
+    width: 240px; flex-shrink: 0;
+    position: sticky; top: 80px;
+    max-height: calc(100vh - 100px); overflow-y: auto;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px;
+  }
+  .toc-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
+  .toc a {
+    display: block; font-size: .82rem; color: var(--muted);
+    text-decoration: none; padding: 4px 6px; border-radius: 5px;
+    line-height: 1.4; transition: background .1s, color .1s;
+  }
+  .toc a:hover { background: var(--bg); color: var(--brand); }
+  .toc .sev { font-size: .8em; }
+
+  /* ── Content */
+  .content { flex: 1; min-width: 0; }
+
+  .content h1 {
+    font-size: 1.8rem; font-weight: 800; color: var(--brand);
+    border-bottom: 3px solid var(--brand); padding-bottom: 12px; margin-bottom: 20px;
+  }
+  .content h2 {
+    font-size: 1.2rem; font-weight: 700; color: var(--ink);
+    margin: 40px 0 14px;
+    padding: 10px 14px; background: var(--card); border-left: 4px solid var(--brand);
+    border-radius: 0 8px 8px 0; border: 1px solid var(--border); border-left: 4px solid var(--brand);
+  }
+  .content h3 { font-size: 1rem; font-weight: 700; margin: 24px 0 10px; color: var(--ink); }
+  .content h4 { font-size: .9rem; font-weight: 600; margin: 16px 0 8px; color: var(--muted); }
+
+  .content p { margin-bottom: 14px; }
+  .content ul, .content ol { margin: 0 0 16px 24px; }
+  .content li { margin-bottom: 5px; }
+
+  .content strong { font-weight: 700; }
+  .content em { font-style: italic; }
+  .content code {
+    background: #EFF6FF; color: #1D4ED8;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: .84em; padding: 1px 5px; border-radius: 4px;
+  }
+  .content pre {
+    background: var(--code-bg); color: var(--code-fg);
+    border-radius: 8px; padding: 16px; overflow-x: auto;
+    margin-bottom: 16px; font-size: .84rem; line-height: 1.6;
+  }
+  .content pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
+
+  .content hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .content a { color: var(--brand); }
+
+  /* ── Tables */
+  .content table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: .9rem; }
+  .content thead { background: var(--brand); color: #fff; }
+  .content th { padding: 10px 14px; text-align: left; font-weight: 600; }
+  .content td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  .content tbody tr:nth-child(even) { background: var(--bg); }
+  .content tbody tr:hover { background: #EEF2FF; }
+
+  /* ── Severity badges */
+  .sev   { font-size: 1em; }
+  .sev.c { color: var(--crit); }
+  .sev.w { color: var(--warn); }
+  .sev.g { color: var(--good); }
+
+  /* ── Cover / Risk Dashboard */
+  .cover {
+    background: #0F172A;
+    border-bottom: 1px solid #1E293B;
+  }
+  .cover-inner {
+    max-width: 1280px; margin: 0 auto;
+    padding: 40px 40px 44px;
+    display: flex; gap: 48px; align-items: center;
+  }
+  .cover-left { flex-shrink: 0; min-width: 260px; }
+  .cover-eyebrow { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #64748B; margin-bottom: 8px; }
+  .cover-repo { font-size: 1.5rem; font-weight: 700; color: #F1F5F9; line-height: 1.2; margin-bottom: 4px; }
+  .cover-repo strong { color: #fff; }
+  .cover-meta { font-size: .8rem; color: #475569; margin-bottom: 28px; }
+  .cover-score-wrap { display: flex; align-items: center; gap: 16px; }
+  .cover-big-ring {
+    width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-big-inner {
+    width: 68px; height: 68px; background: #0F172A;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center; gap: 2px;
+  }
+  .cover-big-num { font-size: 1.8rem; font-weight: 900; line-height: 1; }
+  .cover-big-denom { font-size: .85rem; font-weight: 600; color: #475569; align-self: flex-end; padding-bottom: 4px; }
+  .cover-score-title { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #64748B; margin-bottom: 4px; }
+  .cover-score-lbl { font-size: 1rem; font-weight: 800; }
+  .cover-right { flex: 1; }
+  .sc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 20px 12px; }
+  .sc-card { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sc-ring {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sc-inner {
+    width: 48px; height: 48px; background: #0F172A;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  }
+  .sc-num { font-size: 1.1rem; font-weight: 800; }
+  .sc-label { font-size: .72rem; font-weight: 600; color: #94A3B8; text-align: center; line-height: 1.3; }
+
+  /* ── Print */
+  @media print {
+    .toc, .site-header { display: none; }
+    .layout { padding: 0; }
+    .content h2 { break-before: page; }
+  }
+
+  /* ── Scrollbar */
+  .toc::-webkit-scrollbar { width: 4px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div>
+    <div class="logo">DawerOne</div>
+    <div class="meta">Codebase Assessment</div>
+  </div>
+  <div>
+    <div style="font-size:1rem;font-weight:600">steven-tey/precedent</div>
+    <div class="meta">main · 2026-06-26</div>
+  </div>
+  <div class="badges">
+    <span class="badge">fullstack</span>
+    
+    <span class="badge">claude-opus-4-8</span>
+  </div>
+</header>
+
+
+<div class="cover">
+  <div class="cover-inner">
+    <div class="cover-left">
+      <div class="cover-eyebrow">DawerOne · Codebase Onboarding Report</div>
+      <div class="cover-repo">steven-tey/<strong>precedent</strong></div>
+      <div class="cover-meta">fullstack &nbsp;·&nbsp; 2026-06-26</div>
+      <div class="cover-score-wrap">
+        <div class="cover-big-ring" style="background:conic-gradient(#D97706 70%, rgba(255,255,255,0.12) 70%)">
+          <div class="cover-big-inner">
+            <span class="cover-big-num" style="color:#D97706">7</span>
+            <span class="cover-big-denom">/10</span>
+          </div>
+        </div>
+        <div>
+          <div class="cover-score-title">Overall Score</div>
+          <div class="cover-score-lbl" style="color:#D97706">Warning</div>
+        </div>
+      </div>
+    </div>
+    <div class="cover-right">
+      <div class="sc-grid">
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#16A34A 80%, rgba(255,255,255,0.12) 80%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#16A34A">8</span></div>
+        </div>
+        <div class="sc-label">Code Health</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 50%, rgba(255,255,255,0.12) 50%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div>
+        </div>
+        <div class="sc-label">Dependencies</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 70%, rgba(255,255,255,0.12) 70%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div>
+        </div>
+        <div class="sc-label">Architecture</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 70%, rgba(255,255,255,0.12) 70%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div>
+        </div>
+        <div class="sc-label">Security</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#DC2626 10%, rgba(255,255,255,0.12) 10%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#DC2626">1</span></div>
+        </div>
+        <div class="sc-label">Test Coverage</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 60%, rgba(255,255,255,0.12) 60%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
+        </div>
+        <div class="sc-label">Prod Readiness</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#16A34A 80%, rgba(255,255,255,0.12) 80%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#16A34A">8</span></div>
+        </div>
+        <div class="sc-label">Performance</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#D97706 60%, rgba(255,255,255,0.12) 60%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
+        </div>
+        <div class="sc-label">Docs</div>
+      </div>
+      <div class="sc-card">
+        <div class="sc-ring" style="background:conic-gradient(#DC2626 40%, rgba(255,255,255,0.12) 40%)">
+          <div class="sc-inner"><span class="sc-num" style="color:#DC2626">4</span></div>
+        </div>
+        <div class="sc-label">Infra & CI/CD</div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <a href="#executive-summary">Executive Summary</a><a href="#1-project-summary">1. Project Summary</a><a href="#2-tech-stack">2. Tech Stack</a><a href="#3-architecture">3. Architecture</a><a href="#4-dependency-health">4. Dependency Health</a><a href="#5-infra-deployment">5. Infra &amp; Deployment</a><a href="#6-code-health">6. Code Health</a><a href="#7-completeness">7. Completeness</a><a href="#8-landmines">8. Landmines</a><a href="#9-production-readiness-gaps">9. Production Readiness Gaps</a><a href="#10-ownership-effort-estimate">10. Ownership Effort Estimate</a><a href="#11-data-model">11. Data Model</a><a href="#12-api-surface">12. API Surface</a><a href="#13-auth-authorization">13. Auth &amp; Authorization</a><a href="#14-async-layer">14. Async Layer</a><a href="#15-environment-variables">15. Environment Variables</a><a href="#16-state-management">16. State Management</a><a href="#17-routing">17. Routing</a><a href="#18-design-system">18. Design System</a><a href="#19-performance-flags">19. Performance Flags</a><a href="#20-coupling-assessment">20. Coupling Assessment</a><a href="#21-shared-types">21. Shared Types</a><a href="#quick-wins">Quick Wins</a>
+  </nav>
+  <main class="content">
+    <h1 id="codebase-onboarding-report-steven-tey-precedent">Codebase Onboarding Report — <code>steven-tey/precedent</code></h1>
+<h2 id="executive-summary">Executive Summary</h2>
+<p><code>precedent</code> is not a typical full-stack application — it is an <strong>opinionated Next.js starter template / boilerplate</strong> authored by Steven Tey (creator of Dub.co). It ships a curated collection of UI components, React hooks, utilities, design tokens, and drop-in Clerk authentication, deployed as a single-page marketing/demo site on Vercel. The codebase is small (≈56 files, the vast majority being source), clean, idiomatic, and well-formatted, reflecting a mature author and battle-tested patterns. However, framing it as a &quot;fullstack&quot; product engagement requires resetting expectations: there is <strong>no database, no API layer, no data model, no background jobs, and no tests</strong>. The &quot;backend&quot; surface consists almost entirely of Clerk middleware and one external <code>fetch</code> to GitHub's public API. The primary risks are not in this code but in what a client would build <em>on top of it</em> — and in two notable version choices: a <strong>canary release of Next.js pinned in production</strong> and a TypeScript <code>target: es5</code>. As a template it is a 9/10; as the foundation for a bespoke product it is a solid-but-bare starting point.</p>
+<hr>
+<h2 id="1-project-summary">1. Project Summary</h2>
+<ul><li><strong>Purpose:</strong> A reusable Next.js (App Router) starter template — &quot;building blocks for your Next.js project.&quot; It demonstrates components (modal, popover, tooltip, cards), hooks, utilities, OG image generation, and Clerk auth.</li><li><strong>Current state:</strong> Fully functional demo/marketing site. Everything renders; auth wiring is present; the landing page pulls live GitHub star counts.</li><li><strong>Maturity:</strong> High <em>as a template</em>. The code is consistent, idiomatic, and clearly extracted from production apps (Dub.co is referenced directly). Low maturity <em>as a product</em> — there is no business logic, persistence, or feature surface to own.</li><li><strong>Implication for DawerOne:</strong> Scope the engagement around what the client intends to <em>build</em>, not around this repo. This is essentially scaffolding.</li></ul>
+<hr>
+<h2 id="2-tech-stack">2. Tech Stack</h2>
+<table><thead><tr><th>Layer</th><th>Technology</th><th>Version</th><th>Notes</th></tr></thead><tbody><tr><td>Runtime</td><td>Node.js</td><td>(unpinned — no <code>engines</code> field)</td><td><span class="sev w">🟡</span> No Node version constraint</td></tr><tr><td>Package manager</td><td>pnpm</td><td>9.3.0 (pinned via <code>packageManager</code>)</td><td><span class="sev g">🟢</span> Good — reproducible</td></tr><tr><td>Framework</td><td>Next.js</td><td><strong>14.3.0-canary.57</strong></td><td><span class="sev c">🔴</span> Canary build pinned</td></tr><tr><td>Language</td><td>TypeScript</td><td>5.2.2</td><td><span class="sev g">🟢</span> <code>strict: true</code></td></tr><tr><td>UI runtime</td><td>React / React DOM</td><td>18.3.1</td><td><span class="sev g">🟢</span> Current 18.x</td></tr><tr><td>Auth</td><td>@clerk/nextjs</td><td>^5.6.2</td><td><span class="sev g">🟢</span> Modern Clerk v5</td></tr><tr><td>UI primitives</td><td>@radix-ui (dialog 1.0.5, popover 1.0.7, tooltip 1.0.7)</td><td>—</td><td><span class="sev g">🟢</span></td></tr><tr><td>Animation</td><td>framer-motion</td><td>^8.5.5</td><td><span class="sev w">🟡</span> Old major (current is 11+)</td></tr><tr><td>Drawer</td><td>vaul</td><td>^0.6.8</td><td><span class="sev g">🟢</span></td></tr><tr><td>Icons</td><td>lucide-react</td><td><strong>0.105.0-alpha.4</strong></td><td><span class="sev w">🟡</span> Alpha, very old pin</td></tr><tr><td>Styling</td><td>Tailwind CSS</td><td>^3.3.3 + forms, typography, line-clamp plugins</td><td><span class="sev g">🟢</span></td></tr><tr><td>Markdown</td><td>react-markdown</td><td>^8.0.7</td><td><span class="sev g">🟢</span></td></tr><tr><td>Utils</td><td>clsx ^2, classnames ^2.3.2, tailwind-merge ^1.14, ms ^2.1.3, use-debounce ^9</td><td>—</td><td><span class="sev w">🟡</span> Both <code>clsx</code> AND <code>classnames</code> present (duplication)</td></tr><tr><td>Analytics / OG</td><td>@vercel/analytics ^0.1.11, @vercel/og ^0.0.26</td><td>—</td><td><span class="sev w">🟡</span> Very old <code>0.0.x</code> / <code>0.1.x</code> pins</td></tr><tr><td>Tooling</td><td>ESLint 8.31.0, eslint-config-next 13.1.1, Prettier ^2.8.8</td><td>—</td><td><span class="sev w">🟡</span> ESLint config from Next 13 while running Next 14</td></tr></tbody></table>
+<hr>
+<h2 id="3-architecture">3. Architecture</h2>
+<p>A standard <strong>Next.js App Router</strong> single-app structure — no monorepo, no separate backend service.</p>
+<pre><code class="lang-">app/          → routes, layout, middleware, OG image, sitemap (RSC by default)
+components/
+  home/       → page-specific demo components
+  layout/     → navbar, footer
+  shared/     → reusable primitives (modal, popover, tooltip) + icons
+lib/
+  hooks/      → use-scroll, use-media-query, use-local-storage, use-intersection-observer
+  utils.ts    → cn, fetcher, nFormatter, capitalize, truncate, timeAgo
+  constants.ts</code></pre>
+<p><strong>Patterns observed (all good):</strong></p>
+<ul><li>Clear <strong>Server Component / Client Component split</strong>. Interactive components correctly annotate <code>&quot;use client&quot;</code>; <code>layout.tsx</code> and <code>page.tsx</code> are server components doing data fetch at render time.</li><li><strong>Responsive-primitive pattern</strong>: <code>modal.tsx</code>, <code>popover.tsx</code>, and <code>tooltip.tsx</code> each branch on <code>useMediaQuery().isMobile</code> to render a <code>vaul</code> Drawer on mobile vs. a Radix primitive on desktop. Clean, consistent abstraction.</li><li><strong>Hook-as-component-factory</strong> pattern in <code>demo-modal.tsx</code> (<code>useDemoModal</code> returns a memoized <code>DemoModal</code> + setter) — a reusable idiom worth noting for new devs.</li><li>Path aliases (<code>@/components</code>, <code>@/lib</code>, etc.) configured in <code>tsconfig.json</code>.</li></ul>
+<p><strong>Architectural gaps (by design, but worth flagging):</strong> no service layer, no data-access layer, no API route handlers, no error boundaries beyond <code>Suspense</code>.</p>
+<hr>
+<h2 id="4-dependency-health">4. Dependency Health</h2>
+<p><span class="sev w">🟡</span> <strong>Warning overall.</strong> Several concerning pins:</p>
+<ul><li><span class="sev c">🔴</span> <strong><code>next@14.3.0-canary.57</code></strong> — a <em>canary</em> (pre-release) build pinned in <code>dependencies</code>. Canary builds are unstable, may contain regressions, and are not recommended for production. This should be moved to a stable <code>14.x</code> (or migrated to 15.x deliberately).</li><li><span class="sev w">🟡</span> <strong><code>lucide-react@0.105.0-alpha.4</code></strong> — alpha pin, and extremely behind (current lucide-react is well past 0.4xx). Tree-shaking and icon set are dated.</li><li><span class="sev w">🟡</span> <strong><code>@vercel/og@^0.0.26</code></strong> and <strong><code>@vercel/analytics@^0.1.11</code></strong> — both very old <code>0.x</code> versions. Note <code>app/opengraph-image.tsx</code> imports from <code>next/og</code> (the built-in), so <code>@vercel/og</code> may be a dead/unused dependency.</li><li><span class="sev w">🟡</span> <strong><code>framer-motion@^8</code></strong> — three majors behind (current 11+).</li><li><span class="sev w">🟡</span> <strong>Duplicate utility libs:</strong> both <code>clsx@^2</code> and <code>classnames@^2.3.2</code> are dependencies. <code>layout.tsx</code> uses <code>classnames</code>, while <code>lib/utils.ts</code> uses <code>clsx</code>. Consolidate to one.</li><li><span class="sev w">🟡</span> <strong>ESLint tooling mismatch:</strong> <code>eslint-config-next@13.1.1</code> while running Next 14 canary. ESLint pinned at 8.31.0 (8.x is now EOL).</li><li><span class="sev w">🟡</span> <strong>No <code>engines</code> / Node version pin</strong> — reproducibility risk across dev machines and CI.</li><li><span class="sev g">🟢</span> pnpm version pinned with integrity hash — good supply-chain hygiene.</li></ul>
+<p>Recommend running <code>pnpm outdated</code> and <code>pnpm audit</code> on inheritance; the lockfile is 171KB so the transitive tree is non-trivial.</p>
+<hr>
+<h2 id="5-infra-deployment">5. Infra &amp; Deployment</h2>
+<p><span class="sev w">🟡</span> <strong>Thin.</strong></p>
+<ul><li><strong>Hosting:</strong> Vercel, via one-click deploy button (<code>DEPLOY_URL</code> in <code>lib/constants.ts</code> and README). This is the intended and only documented path.</li><li><strong>CI/CD:</strong> <span class="sev c">🔴</span> <strong>None in the repo.</strong> No <code>.github/workflows</code>, no CI config. Lint/format/build are manual scripts. Vercel's git integration provides preview/prod deploys, but there is no gate (no CI running <code>lint</code>/<code>build</code>/tests before merge).</li><li><strong>Docker / IaC:</strong> None. Not needed for Vercel but absent if the client wants portability.</li><li><strong>Config:</strong> <code>next.config.js</code> — <code>reactStrictMode</code>, <code>swcMinify</code>, image domains (<code>lh3.googleusercontent.com</code>, <code>vercel.com</code>), and a <code>/github</code> redirect.</li><li><strong>Env setup:</strong> <code>.env.example</code> present (Clerk keys + redirect URLs).</li></ul>
+<hr>
+<h2 id="6-code-health">6. Code Health</h2>
+<p><span class="sev g">🟢</span> <strong>Strong for its size.</strong></p>
+<ul><li><strong>Consistency:</strong> Uniform style; Prettier configured with <code>prettier-plugin-tailwindcss</code> (auto class sorting). Components follow consistent prop-typing patterns.</li><li><strong>Typing:</strong> <code>strict: true</code> in tsconfig. Typing is good overall. Minor smells: <code>fetcher&lt;JSON = any&gt;</code> uses <code>any</code>; one <code>@ts-ignore</code> in <code>card.tsx</code> (documented with a reason).</li><li><strong>Linting:</strong> ESLint extends <code>next/core-web-vitals</code> — minimal but appropriate.</li><li><span class="sev w">🟡</span> <strong><code>target: es5</code></strong> in <code>tsconfig.json</code> — outdated for a Next 14 app targeting modern browsers; inflates output and forces unnecessary down-leveling. Should be <code>es2017</code>+.</li><li><span class="sev w">🟡</span> Minor: <code>var</code> used in <code>nFormatter</code> (<code>lib/utils.ts</code>); inconsistent class-formatting in <code>component-grid.tsx</code> (a stray multi-line <code>className</code> template literal that Prettier would normally collapse).</li><li><strong>Dead code risk:</strong> <code>@vercel/og</code> (unused — see §4), <code>truncate</code>/<code>timeAgo</code>/<code>fetcher</code>/<code>capitalize</code> utilities are exported but unused by the demo (intentional — they're &quot;building blocks&quot;).</li></ul>
+<hr>
+<h2 id="7-completeness">7. Completeness</h2>
+<p>This is a <strong>template</strong>, so &quot;completeness&quot; maps to demonstrated building blocks, not features.</p>
+<table><thead><tr><th>Item</th><th>State</th></tr></thead><tbody><tr><td>Landing page + animations</td><td>✅ Done</td></tr><tr><td>Modal / Popover / Tooltip primitives</td><td>✅ Done</td></tr><tr><td>Responsive Drawer fallback</td><td>✅ Done</td></tr><tr><td>Hooks (scroll, media-query, local-storage, intersection-observer)</td><td>✅ Done</td></tr><tr><td>Utilities (nFormatter, capitalize, truncate, timeAgo, fetcher, cn)</td><td>✅ Done</td></tr><tr><td>Clerk auth wiring (provider, middleware, sign-in/user button)</td><td>✅ Done</td></tr><tr><td>OG image generation</td><td>✅ Done</td></tr><tr><td>Sitemap / robots</td><td>✅ Present (sitemap is a single hardcoded URL)</td></tr><tr><td>Database / persistence</td><td>❌ Absent (none intended)</td></tr><tr><td>API routes / handlers</td><td>❌ Absent</td></tr><tr><td>Tests</td><td>❌ Absent</td></tr><tr><td>Protected routes / dashboard</td><td>⚠️ Stubbed — <code>UserButton.Link</code> points to <code>/</code>, no real dashboard route</td></tr></tbody></table>
+<hr>
+<h2 id="8-landmines">8. Landmines</h2>
+<ul><li><span class="sev c">🔴</span> <strong>Canary Next.js in production</strong> (<code>14.3.0-canary.57</code>) — the single biggest stability risk.</li><li><span class="sev w">🟡</span> <strong>Unguarded data fetch in <code>app/page.tsx</code>:</strong> the GitHub API <code>fetch</code> uses <code>.catch((e) =&gt; console.log(e))</code>, so on failure <code>stars</code> becomes <code>undefined</code> and is passed to <code>nFormatter</code> — which returns <code>&quot;0&quot;</code> for falsy input. It degrades gracefully, but the error handling is a <code>console.log</code>, and unauthenticated GitHub API calls are rate-limited (60/hr/IP) — could intermittently show <code>0</code> stars on a busy edge node.</li><li><span class="sev w">🟡</span> <strong>Hardcoded external dependency on <code>https://api.github.com</code></strong> at render time couples the homepage SSR to a third-party API's availability.</li><li><span class="sev w">🟡</span> <strong><code>@ts-ignore</code> in <code>card.tsx</code></strong> masking a React <code>inline</code> attribute warning — minor but should be replaced with a proper typed approach.</li><li><span class="sev w">🟡</span> <strong>Tooltip skips <code>TooltipPrimitive.Portal</code></strong> (commented as intentional) — a known a11y/z-index trade-off the new owner should understand.</li><li><span class="sev g">🟢</span> <strong>No hardcoded secrets</strong> — all secrets via env vars. The <code>GITHUB_OAUTH_TOKEN</code> is optional and read from <code>process.env</code>.</li><li><span class="sev w">🟡</span> <strong>Sitemap is static/hardcoded</strong> to a single URL — will silently rot as routes are added.</li></ul>
+<hr>
+<h2 id="9-production-readiness-gaps">9. Production Readiness Gaps</h2>
+<p>To run a <em>real product</em> built on this safely:</p>
+<ol><li><span class="sev c">🔴</span> Replace <code>next@canary</code> with a pinned stable release; verify Clerk v5 compatibility.</li><li><span class="sev c">🔴</span> Add CI (GitHub Actions): run <code>lint</code>, <code>build</code>, type-check, and tests on PRs.</li><li><span class="sev c">🔴</span> Add a test suite — currently zero. Even smoke tests on the primitives + a Playwright auth flow.</li><li><span class="sev w">🟡</span> Add error boundaries and structured logging; replace <code>console.log</code> error handling in <code>page.tsx</code>.</li><li><span class="sev w">🟡</span> Pin Node version via <code>engines</code> + <code>.nvmrc</code>.</li><li><span class="sev w">🟡</span> Fix <code>tsconfig</code> <code>target</code> to <code>es2017</code>+.</li><li><span class="sev w">🟡</span> Resolve dependency drift (framer-motion, lucide-react alpha, vercel/og possibly dead).</li><li><span class="sev w">🟡</span> Add observability/error tracking (Sentry or similar) — none present.</li><li><span class="sev w">🟡</span> Make the sitemap dynamic and add proper rate-limit handling / caching for external API calls.</li></ol>
+<hr>
+<h2 id="10-ownership-effort-estimate">10. Ownership Effort Estimate</h2>
+<table><thead><tr><th>Task</th><th>Size</th><th>Rationale</th></tr></thead><tbody><tr><td>Onboard a new dev</td><td><strong>S</strong></td><td>Tiny, clean, idiomatic Next.js. A competent React dev is productive in &lt;1 day.</td></tr><tr><td>First safe deploy</td><td><strong>S</strong></td><td>One-click Vercel + 2 Clerk env vars. Caveat: de-canary Next first.</td></tr><tr><td>Full ownership of <em>this template</em></td><td><strong>S–M</strong></td><td>Small surface; main work is dependency hardening + CI + tests.</td></tr><tr><td>Full ownership of a <em>product built on it</em></td><td><strong>L–XL</strong></td><td>Everything real (DB, API, auth rules, business logic) must be <em>added</em>; effort lives entirely in net-new work, not in this repo.</td></tr></tbody></table>
+<hr>
+<h2 id="11-data-model">11. Data Model</h2>
+<p><span class="sev c">🔴</span> <strong>None.</strong> There is no database, ORM, schema file, or migration tooling. No entities, relationships, soft-delete patterns, or indexing exist. User identity is fully delegated to <strong>Clerk</strong> (external, hosted). Any client product will need to introduce a data layer from scratch (Prisma/Drizzle + Postgres/Planetscale is the typical pairing in this author's ecosystem — e.g., Dub.co).</p>
+<hr>
+<h2 id="12-api-surface">12. API Surface</h2>
+<p><span class="sev w">🟡</span> <strong>Effectively none.</strong> No <code>route.ts</code> handlers, no REST/GraphQL/gRPC, no API versioning, no OpenAPI/docs. The only server-side network interactions are:</p>
+<ul><li>Clerk middleware (<code>app/middleware.ts</code>) matching <code>/(api|trpc)(.<em>)</code> — </em>anticipating* future API routes that don't yet exist.</li><li>A single outbound <code>fetch</code> to GitHub's public REST API in <code>page.tsx</code>.</li></ul>
+<p>The middleware matcher already accommodates <code>api</code> and <code>trpc</code> routes, signaling the intended extension point.</p>
+<hr>
+<h2 id="13-auth-authorization">13. Auth &amp; Authorization</h2>
+<p><span class="sev g">🟢</span> <strong>Authentication</strong> is cleanly implemented via <strong>Clerk v5</strong>:</p>
+<ul><li><code>ClerkProvider</code> wraps the app in <code>layout.tsx</code>.</li><li><code>clerkMiddleware()</code> in <code>app/middleware.ts</code> with a well-formed matcher excluding static assets.</li><li><code>&lt;SignedIn&gt;</code> / <code>&lt;SignedOut&gt;</code> / <code>&lt;SignInButton mode=&quot;modal&quot;&gt;</code> / <code>&lt;UserButton&gt;</code> in <code>navbar.tsx</code>.</li></ul>
+<p><span class="sev w">🟡</span> <strong>Authorization:</strong> essentially absent — there is <strong>no role/permission model, no protected route enforcement</strong> beyond Clerk's default middleware (which currently protects nothing specific since there are no gated routes). The <code>UserButton.Link</code> &quot;Dashboard&quot; points to <code>/</code> (placeholder). Any real RBAC must be built. This is expected for a template but is a gap to flag explicitly.</p>
+<hr>
+<h2 id="14-async-layer">14. Async Layer</h2>
+<p><span class="sev c">🔴</span> <strong>None.</strong> No background jobs, queues, workers, cron/scheduled tasks, or event bus. <code>next: { revalidate: 86400 }</code> on the GitHub fetch is the only &quot;scheduled&quot; behavior (ISR cache revalidation). Any async/worker needs (email, webhooks, queues) are net-new.</p>
+<hr>
+<h2 id="15-environment-variables">15. Environment Variables</h2>
+<p><span class="sev g">🟢</span> <code>.env.example</code> is present and clear:</p>
+<table><thead><tr><th>Var</th><th>Purpose</th><th>Required</th></tr></thead><tbody><tr><td><code>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</code></td><td>Clerk public key</td><td>Yes</td></tr><tr><td><code>CLERK_SECRET_KEY</code></td><td>Clerk secret</td><td>Yes</td></tr><tr><td><code>NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL</code></td><td>Post sign-in redirect (<code>/</code>)</td><td>Yes</td></tr><tr><td><code>NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL</code></td><td>Post sign-up redirect (<code>/</code>)</td><td>Yes</td></tr><tr><td><code>GITHUB_OAUTH_TOKEN</code></td><td>Optional, raises GitHub API rate limit</td><td>No</td></tr><tr><td><code>VERCEL_URL</code></td><td>Auto-injected by Vercel, used in OG image</td><td>Auto</td></tr></tbody></table>
+<p><span class="sev w">🟡</span> <code>GITHUB_OAUTH_TOKEN</code> is used in <code>page.tsx</code> but <strong>not documented</strong> in <code>.env.example</code>. Secrets management is delegated to Vercel env vars — no Vault/SOPS, appropriate for this scale.</p>
+<hr>
+<h2 id="16-state-management">16. State Management</h2>
+<p><span class="sev g">🟢</span> <strong>Intentionally minimal.</strong> No Redux/Zustand/Jotai/Context-based global store. State is <strong>local component state</strong> (<code>useState</code>) plus a couple of custom hooks (<code>useLocalStorage</code>, <code>useScroll</code>, <code>useMediaQuery</code>). The <code>useDemoModal</code> factory pattern colocates modal state. For a template this is correct; a growing product will likely need a global state solution, but introducing one now would be premature.</p>
+<hr>
+<h2 id="17-routing">17. Routing</h2>
+<p><span class="sev g">🟢</span> <strong>Next.js App Router.</strong> Currently a <strong>single route</strong> (<code>/</code>) plus framework files (<code>layout</code>, <code>middleware</code>, <code>sitemap</code>, <code>opengraph-image</code>). Code splitting is automatic per-route/component via Next. One redirect (<code>/github</code> → repo) in <code>next.config.js</code>. No dynamic routes (<code>[slug]</code>) yet. Navigation uses <code>next/link</code> (<code>navbar.tsx</code>). Routing complexity is essentially nil — clean slate for expansion.</p>
+<hr>
+<h2 id="18-design-system">18. Design System</h2>
+<p><span class="sev g">🟢</span> <strong>The strongest part of the repo</strong> — it <em>is</em> the product.</p>
+<ul><li><strong>Tailwind CSS</strong> utility-first, with <code>@tailwindcss/forms</code>, <code>/typography</code>, <code>/line-clamp</code> plugins.</li><li><strong>Design tokens</strong> via Tailwind theme extensions: custom <code>fontFamily</code> (<code>--font-sf</code>, <code>--font-inter</code>), keyframe animations (<code>fade-up</code>, <code>fade-down</code>, <code>slide-up-fade</code>, <code>slide-down-fade</code>), and custom Radix data-attribute variants (<code>radix-side-top/bottom</code>).</li><li><strong>Fonts:</strong> local SF Pro Display + Google Inter, optimized via <code>next/font</code>.</li><li><strong>Primitives</strong> built on Radix (accessible by default) with consistent mobile-Drawer fallbacks.</li><li><strong><code>cn()</code> helper</strong> (<code>clsx</code> + <code>tailwind-merge</code>) for safe class composition.</li><li><span class="sev w">🟡</span> Minor inconsistency: <code>layout.tsx</code> uses <code>classnames</code>'s <code>cx</code> instead of the project's own <code>cn()</code> — consolidate.</li></ul>
+<hr>
+<h2 id="19-performance-flags">19. Performance Flags</h2>
+<p><span class="sev g">🟢</span> <strong>Well-optimized for a Next.js app.</strong></p>
+<ul><li><code>next/font</code> (zero external font requests), <code>next/image</code>, <code>swcMinify</code>, RSC-first rendering.</li><li>ISR (24h revalidate) on the GitHub fetch caches the data-fetching page.</li><li><code>@vercel/analytics</code> + a <code>WebVitals</code> demo component present.</li><li>Animations are GPU-friendly (transform/opacity).</li></ul>
+<p><span class="sev w">🟡</span> <strong>Risks:</strong></p>
+<ul><li><code>tsconfig target: es5</code> forces unnecessary transpilation/polyfilling, bloating bundles.</li><li><code>framer-motion@8</code> is a non-trivial bundle; only used in one demo component — ensure it stays tree-shaken / lazily loaded if expanded.</li><li>SSR coupling to <code>api.github.com</code> could spike TTFB if GitHub is slow on a cache miss.</li></ul>
+<hr>
+<h2 id="20-coupling-assessment">20. Coupling Assessment</h2>
+<p><strong>N/A in the traditional sense</strong> — there is no separate backend to decouple. Frontend and &quot;backend&quot; are the same Next.js deployment. Auth is externalized to Clerk (already decoupled). The architecture is a <strong>monolithic, edge/serverless Next.js app</strong>; it cannot be split into independently deployed FE/BE today because no backend service exists. If the client builds an API, the natural pattern is Next.js Route Handlers (keeping it monolithic) — independent deployment would require a deliberate architectural decision later. <strong>Coupling is therefore low by absence, not by design discipline.</strong></p>
+<hr>
+<h2 id="21-shared-types">21. Shared Types</h2>
+<p><span class="sev w">🟡</span> <strong>No formal strategy</strong> — and none needed yet, since there's no API/DB boundary to share types across. Types are defined inline per-component (prop interfaces). There is no shared <code>types/</code> package, no codegen (no GraphQL/OpenAPI), no Zod schemas. When the client adds an API + DB, they should establish a type-sharing approach early (e.g., Drizzle/Prisma-inferred types, Zod for runtime validation, or tRPC for end-to-end inference) — this is greenfield.</p>
+<hr>
+<h2 id="quick-wins">Quick Wins</h2>
+<ol><li><strong>De-canary Next.js</strong> — pin <code>next</code> to a stable <code>14.x</code> release. Highest-leverage stability fix in the repo.</li><li><strong>Add a minimal CI workflow</strong> (<code>lint</code> + <code>build</code> + type-check on PRs) — currently nothing gates merges.</li><li><strong>Bump <code>tsconfig</code> <code>target</code> from <code>es5</code> to <code>es2017</code>+</strong> — free bundle-size and clarity win for a modern Next app.</li><li><strong>Consolidate <code>clsx</code> vs <code>classnames</code></strong> (use <code>cn()</code> everywhere, drop <code>classnames</code>) and <strong>verify/remove unused <code>@vercel/og</code></strong> — trims dependency surface.</li><li><strong>Harden <code>page.tsx</code> GitHub fetch</strong> — document <code>GITHUB_OAUTH_TOKEN</code> in <code>.env.example</code>, replace <code>console.log</code> error handling, and treat the external call's failure mode explicitly.</li></ol>
+<hr>
+<p><em>Assessment caveat: This repository is a starter template, not a delivered product. Scores for <code>test_coverage</code>, <code>dependency_health</code>, and <code>infra_ci</code> reflect production-product expectations and should be read in that light — for the template's stated purpose, it is well-executed and a reasonable foundation to build on.</em></p>
+  </main>
+</div>
+
+<script>
+  // Highlight active TOC link on scroll
+  const links = document.querySelectorAll('.toc a');
+  const headings = [...document.querySelectorAll('.content h2')];
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY + 120;
+    let active = headings.findIndex(h => h.offsetTop > y) - 1;
+    if (active < 0) active = 0;
+    links.forEach((l, i) => l.style.color = i === active ? 'var(--brand)' : '');
+  }, { passive: true });
+</script>
+</body>
+</html>
