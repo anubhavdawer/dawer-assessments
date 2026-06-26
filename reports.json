@@ -1,0 +1,21 @@
+[
+  {
+    "owner": "calcom",
+    "repo": "cal.com",
+    "type": "fullstack",
+    "date": "2026-06-26",
+    "slug": "calcom_cal.com_2026-06-26",
+    "scores": {
+      "overall": 6,
+      "code_health": 6,
+      "dependency_health": 5,
+      "architecture": 7,
+      "security": 6,
+      "test_coverage": 6,
+      "production_readiness": 6,
+      "performance": 5,
+      "documentation": 7,
+      "infra_ci": 8
+    }
+  }
+]
