@@ -1,263 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DawerOne Assessment — calcom/cal.com</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --brand:   #4F46E5;
-    --ink:     #0F172A;
-    --muted:   #64748B;
-    --border:  #E2E8F0;
-    --bg:      #F8FAFC;
-    --card:    #FFFFFF;
-    --crit-bg: #FEF2F2; --crit:  #DC2626;
-    --warn-bg: #FFFBEB; --warn:  #D97706;
-    --good-bg: #F0FDF4; --good:  #16A34A;
-    --code-bg: #1E293B; --code-fg: #E2E8F0;
-  }
-
-  html { font-size: 16px; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg); color: var(--ink); line-height: 1.7;
-    display: flex; flex-direction: column; min-height: 100vh;
-  }
-
-  /* ── Header */
-  .site-header {
-    background: var(--brand);
-    color: #fff;
-    padding: 24px 40px;
-    display: flex; align-items: center; gap: 24px;
-    position: sticky; top: 0; z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  }
-  .site-header .logo { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; }
-  .site-header .meta { font-size: .85rem; opacity: .85; }
-  .site-header .badges { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
-  .badge {
-    background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
-    border-radius: 99px; padding: 2px 10px; font-size: .78rem; color: #fff;
-  }
-
-  /* ── Layout */
-  .layout { display: flex; align-items: flex-start; max-width: 1280px; margin: 0 auto; width: 100%; padding: 32px 24px; gap: 40px; }
-
-  /* ── TOC */
-  .toc {
-    width: 240px; flex-shrink: 0;
-    position: sticky; top: 80px;
-    max-height: calc(100vh - 100px); overflow-y: auto;
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px;
-  }
-  .toc-title { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 10px; }
-  .toc a {
-    display: block; font-size: .82rem; color: var(--muted);
-    text-decoration: none; padding: 4px 6px; border-radius: 5px;
-    line-height: 1.4; transition: background .1s, color .1s;
-  }
-  .toc a:hover { background: var(--bg); color: var(--brand); }
-  .toc .sev { font-size: .8em; }
-
-  /* ── Content */
-  .content { flex: 1; min-width: 0; }
-
-  .content h1 {
-    font-size: 1.8rem; font-weight: 800; color: var(--brand);
-    border-bottom: 3px solid var(--brand); padding-bottom: 12px; margin-bottom: 20px;
-  }
-  .content h2 {
-    font-size: 1.2rem; font-weight: 700; color: var(--ink);
-    margin: 40px 0 14px;
-    padding: 10px 14px; background: var(--card); border-left: 4px solid var(--brand);
-    border-radius: 0 8px 8px 0; border: 1px solid var(--border); border-left: 4px solid var(--brand);
-  }
-  .content h3 { font-size: 1rem; font-weight: 700; margin: 24px 0 10px; color: var(--ink); }
-  .content h4 { font-size: .9rem; font-weight: 600; margin: 16px 0 8px; color: var(--muted); }
-
-  .content p { margin-bottom: 14px; }
-  .content ul, .content ol { margin: 0 0 16px 24px; }
-  .content li { margin-bottom: 5px; }
-
-  .content strong { font-weight: 700; }
-  .content em { font-style: italic; }
-  .content code {
-    background: #EFF6FF; color: #1D4ED8;
-    font-family: "SF Mono", Menlo, Consolas, monospace;
-    font-size: .84em; padding: 1px 5px; border-radius: 4px;
-  }
-  .content pre {
-    background: var(--code-bg); color: var(--code-fg);
-    border-radius: 8px; padding: 16px; overflow-x: auto;
-    margin-bottom: 16px; font-size: .84rem; line-height: 1.6;
-  }
-  .content pre code { background: none; color: inherit; padding: 0; font-size: inherit; }
-
-  .content hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
-  .content a { color: var(--brand); }
-
-  /* ── Tables */
-  .content table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: .9rem; }
-  .content thead { background: var(--brand); color: #fff; }
-  .content th { padding: 10px 14px; text-align: left; font-weight: 600; }
-  .content td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
-  .content tbody tr:nth-child(even) { background: var(--bg); }
-  .content tbody tr:hover { background: #EEF2FF; }
-
-  /* ── Severity badges */
-  .sev   { font-size: 1em; }
-  .sev.c { color: var(--crit); }
-  .sev.w { color: var(--warn); }
-  .sev.g { color: var(--good); }
-
-  /* ── Dashboard */
-  .dashboard {
-    background: var(--card); border: 1px solid var(--border);
-    border-radius: 12px; padding: 24px 28px; margin-bottom: 32px;
-  }
-  .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .dash-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
-  .dash-overall { display: flex; align-items: baseline; gap: 4px; }
-  .dash-score { font-size: 2.4rem; font-weight: 900; line-height: 1; }
-  .dash-denom { font-size: 1.1rem; font-weight: 600; color: var(--muted); }
-  .dash-olabel { margin-left: 8px; font-size: .85rem; font-weight: 700; }
-  .sc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 16px; }
-  .sc-card { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .sc-ring {
-    width: 68px; height: 68px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .sc-inner {
-    width: 52px; height: 52px; background: var(--card);
-    border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  }
-  .sc-num { font-size: 1.25rem; font-weight: 800; }
-  .sc-label { font-size: .78rem; font-weight: 600; color: var(--ink); text-align: center; line-height: 1.3; }
-  .sc-tag { font-size: .68rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
-
-  /* ── Print */
-  @media print {
-    .toc, .site-header { display: none; }
-    .layout { padding: 0; }
-    .content h2 { break-before: page; }
-  }
-
-  /* ── Scrollbar */
-  .toc::-webkit-scrollbar { width: 4px; }
-  .toc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--brand:#4F46E5;--ink:#0F172A;--muted:#64748B;--border:#E2E8F0;--bg:#F8FAFC;--card:#FFFFFF;--crit:#DC2626;--warn:#D97706;--good:#16A34A;--code-bg:#1E293B;--code-fg:#E2E8F0}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;display:flex;flex-direction:column;min-height:100vh}
+.site-header{background:var(--brand);color:#fff;padding:16px 40px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.logo{font-size:1.1rem;font-weight:800;letter-spacing:-.5px}
+.badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:2px 10px;font-size:.75rem;color:#fff}
+/* Cover */
+.cover{background:#0F172A;border-bottom:1px solid #1E293B}
+.cover-inner{max-width:1280px;margin:0 auto;padding:40px 40px 44px;display:flex;gap:48px;align-items:center;flex-wrap:wrap}
+.cover-left{flex-shrink:0;min-width:240px}
+.cover-eyebrow{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#64748B;margin-bottom:8px}
+.cover-repo{font-size:1.5rem;font-weight:700;color:#94A3B8;line-height:1.2;margin-bottom:4px}
+.cover-repo strong{color:#fff}
+.cover-meta{font-size:.8rem;color:#475569;margin-bottom:28px}
+.cover-score-wrap{display:flex;align-items:center;gap:18px}
+.cover-big-ring{width:90px;height:90px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.cover-big-inner{width:70px;height:70px;background:#0F172A;border-radius:50%;display:flex;align-items:center;justify-content:center;gap:2px}
+.cover-big-num{font-size:1.9rem;font-weight:900;line-height:1}
+.cover-big-denom{font-size:.85rem;font-weight:600;color:#475569;align-self:flex-end;padding-bottom:5px}
+.cover-score-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#64748B;margin-bottom:4px}
+.cover-score-lbl{font-size:1rem;font-weight:800}
+.cover-right{flex:1;min-width:280px}
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:20px 10px}
+.sc-card{display:flex;flex-direction:column;align-items:center;gap:7px}
+.sc-ring{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.sc-inner{width:48px;height:48px;background:#0F172A;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.sc-num{font-size:1.1rem;font-weight:800}
+.sc-label{font-size:.7rem;font-weight:600;color:#94A3B8;text-align:center;line-height:1.3}
+/* Layout */
+.layout{display:flex;align-items:flex-start;max-width:1280px;margin:0 auto;width:100%;padding:32px 24px;gap:40px}
+.toc{width:230px;flex-shrink:0;position:sticky;top:60px;max-height:calc(100vh - 80px);overflow-y:auto;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.toc-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.toc a{display:block;font-size:.8rem;color:var(--muted);text-decoration:none;padding:4px 6px;border-radius:5px;line-height:1.4;transition:background .1s,color .1s}
+.toc a:hover{background:var(--bg);color:var(--brand)}
+.content{flex:1;min-width:0}
+.content h1{font-size:1.75rem;font-weight:800;color:var(--brand);border-bottom:3px solid var(--brand);padding-bottom:12px;margin-bottom:24px}
+.content h2{font-size:1.1rem;font-weight:700;margin:36px 0 14px;padding:10px 16px;background:var(--card);border:1px solid var(--border);border-left:4px solid var(--brand);border-radius:0 8px 8px 0}
+.content h3{font-size:1rem;font-weight:700;margin:22px 0 10px}
+.content h4{font-size:.9rem;font-weight:600;margin:14px 0 8px;color:var(--muted)}
+.content p{margin-bottom:14px}
+.content ul,.content ol{margin:0 0 16px 24px}
+.content li{margin-bottom:5px}
+.content strong{font-weight:700}.content em{font-style:italic}
+.content code{background:#EFF6FF;color:#1D4ED8;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:.84em;padding:1px 5px;border-radius:4px}
+.content pre{background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:16px;overflow-x:auto;margin-bottom:16px;font-size:.84rem;line-height:1.6}
+.content pre code{background:none;color:inherit;padding:0;font-size:inherit}
+.content hr{border:none;border-top:1px solid var(--border);margin:24px 0}
+.content a{color:var(--brand)}
+.content table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:.9rem}
+.content thead{background:var(--brand);color:#fff}
+.content th{padding:10px 14px;text-align:left;font-weight:600}
+.content td{padding:9px 14px;border-bottom:1px solid var(--border)}
+.content tbody tr:nth-child(even){background:var(--bg)}
+.content tbody tr:hover{background:#EEF2FF}
+.sev.c{color:var(--crit)}.sev.w{color:var(--warn)}.sev.g{color:var(--good)}
+.toc::-webkit-scrollbar{width:4px}.toc::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+@media print{.toc,.site-header,.cover{display:none}.layout{padding:0}.content h2{break-before:page}}
 </style>
 </head>
 <body>
-
 <header class="site-header">
-  <div>
-    <div class="logo">DawerOne</div>
-    <div class="meta">Codebase Assessment</div>
-  </div>
-  <div>
-    <div style="font-size:1rem;font-weight:600">calcom/cal.com</div>
-    <div class="meta">main · 2026-06-26</div>
-  </div>
-  <div class="badges">
-    <span class="badge">fullstack</span>
-    
-    <span class="badge">claude-opus-4-8</span>
-  </div>
+  <span class="logo">DawerOne</span>
+  <span class="badge">fullstack</span>
+  <span class="badge" style="margin-left:auto">claude-opus-4-8</span>
 </header>
-
+<div class="cover"><div class="cover-inner"><div class="cover-left"><div class="cover-eyebrow">DawerOne · Codebase Assessment</div><div class="cover-repo">calcom/<strong>cal.com</strong></div><div class="cover-meta">fullstack &nbsp;·&nbsp; 2026-06-26</div><div class="cover-score-wrap"><div class="cover-big-ring" style="background:conic-gradient(#D97706 60%,rgba(255,255,255,0.12) 60%)"><div class="cover-big-inner"><span class="cover-big-num" style="color:#D97706">6</span><span class="cover-big-denom">/10</span></div></div><div><div class="cover-score-title">Overall Score</div><div class="cover-score-lbl" style="color:#D97706">Warning</div></div></div></div><div class="cover-right"><div class="sc-grid"><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#16A34A 80%,rgba(255,255,255,0.12) 80%)"><div class="sc-inner"><span class="sc-num" style="color:#16A34A">8</span></div></div><div class="sc-label">Code Health</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#DC2626 40%,rgba(255,255,255,0.12) 40%)"><div class="sc-inner"><span class="sc-num" style="color:#DC2626">4</span></div></div><div class="sc-label">Dependencies</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#16A34A 80%,rgba(255,255,255,0.12) 80%)"><div class="sc-inner"><span class="sc-num" style="color:#16A34A">8</span></div></div><div class="sc-label">Architecture</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#D97706 70%,rgba(255,255,255,0.12) 70%)"><div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div></div><div class="sc-label">Security</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#DC2626 10%,rgba(255,255,255,0.12) 10%)"><div class="sc-inner"><span class="sc-num" style="color:#DC2626">1</span></div></div><div class="sc-label">Test Coverage</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#DC2626 40%,rgba(255,255,255,0.12) 40%)"><div class="sc-inner"><span class="sc-num" style="color:#DC2626">4</span></div></div><div class="sc-label">Prod Readiness</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#D97706 70%,rgba(255,255,255,0.12) 70%)"><div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div></div><div class="sc-label">Performance</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#D97706 50%,rgba(255,255,255,0.12) 50%)"><div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div></div><div class="sc-label">Docs</div></div><div class="sc-card"><div class="sc-ring" style="background:conic-gradient(#D97706 50%,rgba(255,255,255,0.12) 50%)"><div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div></div><div class="sc-label">Infra & CI/CD</div></div></div></div></div></div>
 <div class="layout">
-  <nav class="toc">
-    <div class="toc-title">Contents</div>
-    <a href="#executive-summary">Executive Summary</a><a href="#1-project-summary">1. Project Summary</a><a href="#2-tech-stack">2. Tech Stack</a><a href="#3-architecture">3. Architecture</a><a href="#4-dependency-health">4. Dependency Health</a><a href="#5-infra-deployment">5. Infra &amp; Deployment</a><a href="#6-code-health">6. Code Health</a><a href="#7-completeness">7. Completeness</a><a href="#8-landmines">8. Landmines</a><a href="#9-production-readiness-gaps">9. Production Readiness Gaps</a><a href="#10-ownership-effort-estimate">10. Ownership Effort Estimate</a><a href="#fullstack-specific-sections">Fullstack-Specific Sections</a><a href="#11-data-model">11. Data Model</a><a href="#12-api-surface">12. API Surface</a><a href="#13-auth-authorization">13. Auth &amp; Authorization</a><a href="#14-async-layer">14. Async Layer</a><a href="#15-environment-variables">15. Environment Variables</a><a href="#16-state-management">16. State Management</a><a href="#17-routing">17. Routing</a><a href="#18-design-system">18. Design System</a><a href="#19-performance-flags">19. Performance Flags</a><a href="#20-coupling-assessment">20. Coupling Assessment</a><a href="#21-shared-types">21. Shared Types</a><a href="#quick-wins">Quick Wins</a>
-  </nav>
-  <main class="content">
-    
-  <div class="dashboard">
-    <div class="dash-header">
-      <div class="dash-title">Risk Dashboard</div>
-      <div class="dash-overall" style="color:#D97706">
-        <span class="dash-score">6</span><span class="dash-denom">/10</span>
-        <span class="dash-olabel">Warning</span>
-      </div>
-    </div>
-    <div class="sc-grid">
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 60%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
-        </div>
-        <div class="sc-label">Overall</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 60%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
-        </div>
-        <div class="sc-label">Code Health</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 50%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div>
-        </div>
-        <div class="sc-label">Dependencies</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 60%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
-        </div>
-        <div class="sc-label">Architecture</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 50%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div>
-        </div>
-        <div class="sc-label">Security</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 60%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
-        </div>
-        <div class="sc-label">Test Coverage</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 50%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">5</span></div>
-        </div>
-        <div class="sc-label">Prod Readiness</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 60%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">6</span></div>
-        </div>
-        <div class="sc-label">Performance</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 70%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div>
-        </div>
-        <div class="sc-label">Docs</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div>
-      <div class="sc-card">
-        <div class="sc-ring" style="background:conic-gradient(#D97706 70%,#E2E8F0 0)">
-          <div class="sc-inner"><span class="sc-num" style="color:#D97706">7</span></div>
-        </div>
-        <div class="sc-label">Infra & CI/CD</div>
-        <div class="sc-tag" style="background:#D9770618;color:#D97706">Warning</div>
-      </div></div>
-  </div>
-    <p>I have a comprehensive understanding of the codebase. Now I'll write the full inheritance report.</p>
+  <nav class="toc"><div class="toc-title">Contents</div><a href="#executive-summary">Executive Summary</a><a href="#1-project-summary">1. Project Summary</a><a href="#2-tech-stack">2. Tech Stack</a><a href="#3-architecture">3. Architecture</a><a href="#4-dependency-health">4. Dependency Health</a><a href="#5-infra-deployment">5. Infra &amp; Deployment</a><a href="#6-code-health">6. Code Health</a><a href="#7-completeness">7. Completeness</a><a href="#8-landmines">8. Landmines</a><a href="#9-production-readiness-gaps">9. Production Readiness Gaps</a><a href="#10-ownership-effort-estimate">10. Ownership Effort Estimate</a><a href="#fullstack-specific-sections">Fullstack-Specific Sections</a><a href="#11-data-model">11. Data Model</a><a href="#12-api-surface">12. API Surface</a><a href="#13-auth-authorization">13. Auth &amp; Authorization</a><a href="#14-async-layer">14. Async Layer</a><a href="#15-environment-variables">15. Environment Variables</a><a href="#16-state-management">16. State Management</a><a href="#17-routing">17. Routing</a><a href="#18-design-system">18. Design System</a><a href="#19-performance-flags">19. Performance Flags</a><a href="#20-coupling-assessment">20. Coupling Assessment</a><a href="#21-shared-types">21. Shared Types</a><a href="#quick-wins">Quick Wins</a></nav>
+  <main class="content"><p>I have a comprehensive understanding of the codebase. Now I'll write the full inheritance report.</p>
 <h1 id="codebase-inheritance-assessment-calcom-cal-com-forked-as-cal-diy">Codebase Inheritance Assessment — calcom/cal.com (forked as &quot;Cal.diy&quot;)</h1>
 <h2 id="executive-summary">Executive Summary</h2>
 <p>This is a very large, mature, production-grade scheduling platform — a Turborepo monorepo containing <strong>7,690+ files</strong> across a Next.js 16 web app, a NestJS &quot;API v2&quot; platform, a tRPC backend, a large Prisma/PostgreSQL data layer, an extensive app-store integration system, and React embed packages. The repository is the open-source Cal.com codebase rebranded as a community fork (&quot;Cal.diy&quot;); however, the actual code still contains a large amount of commercial/&quot;enterprise&quot; surface area (Stripe billing, organizations, SAML/SCIM, Cal.ai voice agents, credit billing), so the README's claim that &quot;enterprise code has been removed&quot; is <strong>not</strong> reflected in the schema, env vars, or modules we read. This is healthy, actively maintained software with strong CI, but it is enormous, deeply coupled, and operationally demanding: it requires Postgres, Redis, an SMTP server, dozens of third-party OAuth credentials, and careful secret management. Inheriting it safely is an <strong>XL</strong> undertaking — onboarding alone is multi-week, and &quot;full ownership&quot; implies a team, not an individual. The biggest risks are sheer surface area/complexity, a sprawling 100KB+ Prisma schema with no clear soft-delete strategy, an env-var matrix in the hundreds, and the gap between the &quot;stripped-down fork&quot; narrative and the still-commercial reality of the code.</p>
@@ -310,20 +126,15 @@
 <ul><li><span class="sev g">🟢</span> <strong>Excellent, codegen-driven type sharing — the strongest area of the codebase.</strong></li><li>Prisma generates the client + <strong>Zod schemas</strong> (<code>zod-prisma-types</code>) + <strong>Kysely types</strong> + an enum generator from one schema.</li><li><strong>tRPC</strong> shares types end-to-end between the web backend and front-end automatically (<code>AppRouter</code> type export).</li><li>Dedicated <code>@calcom/platform-types</code>, <code>@calcom/platform-enums</code>, <code>@calcom/types</code>, <code>@calcom/tsconfig</code> packages.</li><li>Zod schemas are embedded directly in the Prisma schema via <code>/// @zod.import(...)</code> annotations, keeping validation and DB shape co-located.</li><li><span class="sev g">🟢</span> Essentially <strong>zero manual type duplication</strong> between layers. This is best-in-class and a major asset for a maintainer.</li></ul>
 <hr>
 <h2 id="quick-wins">Quick Wins</h2>
-<ol><li><span class="sev c">🔴</span> <strong>Purge live-looking secrets from version control.</strong> Blank out <code>CRON_API_KEY</code> in <code>.env.example</code>, remove <code>NEXTAUTH_SECRET=secret</code>/<code>CALENDSO_ENCRYPTION_KEY=secret</code> defaults from the Dockerfile, and add a startup assertion that refuses to boot in <code>NODE_ENV=production</code> if any secret equals a known placeholder. High impact, low effort, closes the worst footgun.</li><li><span class="sev w">🟡</span> <strong>Audit &amp; document the fork's true feature set.</strong> One-page matrix of &quot;claimed removed vs. actually present&quot; (orgs, SAML, billing, Cal.ai). This single artifact de-risks all downstream scoping and prevents the team from operating on a false mental model.</li><li><span class="sev w">🟡</span> <strong>Reconcile dependency version skew</strong> (Stripe 9/15, Sentry 9/10, Prisma 5/6, Turbo 2.5/2.7, Yarn engines 3.4.1 in <code>apps/web</code>). Aligning these removes a class of subtle cross-workspace bugs and unblocks future upgrades.</li><li><span class="sev w">🟡</span> <strong>Remove the DB-at-build-time requirement</strong> (or provision an ephemeral DB in CI). Frees up the build pipeline and removes a fragile coupling that bites every new environment.</li><li><span class="sev w">🟡</span> <strong>Bump documented Node floor to 20+</strong> and raise the audit gate to fail on <code>high</code> (not just <code>critical</code>) — cheap hardening given the 80-entry resolutions treadmill already in place.</li></ol>
-  </main>
+<ol><li><span class="sev c">🔴</span> <strong>Purge live-looking secrets from version control.</strong> Blank out <code>CRON_API_KEY</code> in <code>.env.example</code>, remove <code>NEXTAUTH_SECRET=secret</code>/<code>CALENDSO_ENCRYPTION_KEY=secret</code> defaults from the Dockerfile, and add a startup assertion that refuses to boot in <code>NODE_ENV=production</code> if any secret equals a known placeholder. High impact, low effort, closes the worst footgun.</li><li><span class="sev w">🟡</span> <strong>Audit &amp; document the fork's true feature set.</strong> One-page matrix of &quot;claimed removed vs. actually present&quot; (orgs, SAML, billing, Cal.ai). This single artifact de-risks all downstream scoping and prevents the team from operating on a false mental model.</li><li><span class="sev w">🟡</span> <strong>Reconcile dependency version skew</strong> (Stripe 9/15, Sentry 9/10, Prisma 5/6, Turbo 2.5/2.7, Yarn engines 3.4.1 in <code>apps/web</code>). Aligning these removes a class of subtle cross-workspace bugs and unblocks future upgrades.</li><li><span class="sev w">🟡</span> <strong>Remove the DB-at-build-time requirement</strong> (or provision an ephemeral DB in CI). Frees up the build pipeline and removes a fragile coupling that bites every new environment.</li><li><span class="sev w">🟡</span> <strong>Bump documented Node floor to 20+</strong> and raise the audit gate to fail on <code>high</code> (not just <code>critical</code>) — cheap hardening given the 80-entry resolutions treadmill already in place.</li></ol></main>
 </div>
-
 <script>
-  // Highlight active TOC link on scroll
-  const links = document.querySelectorAll('.toc a');
-  const headings = [...document.querySelectorAll('.content h2')];
-  window.addEventListener('scroll', () => {
-    const y = window.scrollY + 120;
-    let active = headings.findIndex(h => h.offsetTop > y) - 1;
-    if (active < 0) active = 0;
-    links.forEach((l, i) => l.style.color = i === active ? 'var(--brand)' : '');
-  }, { passive: true });
+const links=document.querySelectorAll('.toc a');
+const headings=[...document.querySelectorAll('.content h2')];
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY+100;
+  let a=headings.findIndex(h=>h.offsetTop>y)-1;if(a<0)a=0;
+  links.forEach((l,i)=>{l.style.color=i===a?'var(--brand)':'';l.style.fontWeight=i===a?'600':'';});
+},{passive:true});
 </script>
-</body>
-</html>
+</body></html>
