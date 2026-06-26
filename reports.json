@@ -1,5 +1,24 @@
 [
   {
+    "owner": "steven-tey",
+    "repo": "precedent",
+    "type": "fullstack",
+    "date": "2026-06-26",
+    "slug": "steven-tey_precedent_2026-06-26",
+    "scores": {
+      "overall": 7,
+      "code_health": 8,
+      "dependency_health": 5,
+      "architecture": 7,
+      "security": 7,
+      "test_coverage": 1,
+      "production_readiness": 6,
+      "performance": 8,
+      "documentation": 6,
+      "infra_ci": 4
+    }
+  },
+  {
     "owner": "calcom",
     "repo": "cal.com",
     "type": "fullstack",
